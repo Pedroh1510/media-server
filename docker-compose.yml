@@ -1,0 +1,28 @@
+version: '2.1'
+services:
+  rss:
+    # image: do
+    build: .
+    container_name: teste
+    command: node --watch src/server.js
+    ports:
+      - 4000:4000
+    environment:
+      - port=4000
+      - DATABASE_URL=file:./dev.db
+      # - DATABASE_URL=file:./temp/dev.db
+    # volumes:
+    # - .:/app
+    # - ./temp/:/app/prisma/
+    # - ./temp/:/app/prisma/dev.db-journal
+    # - ./prisma:/app/prisma
+    # - ./.env:/app/.env
+  # sonarr:
+  #   image: lscr.io/linuxserver/sonarr:latest
+  #   container_name: sonarrTest
+  #   environment:
+  #     - PUID=1000
+  #     - PGID=1000
+  #     - TZ=Etc/UTC
+  #   ports:
+  #     - 8989:8989
