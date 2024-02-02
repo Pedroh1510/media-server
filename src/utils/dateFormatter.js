@@ -9,8 +9,15 @@ export default class DateFormatter {
 	 * @returns {number}
 	 */
 	static diff(date, date2, unit = 'h') {
-		const a = dayjs(date);
-		const b = dayjs(date2);
-		return a.diff(b, unit);
+		return dayjs(date).diff(dayjs(date2), unit);
+	}
+	/**
+	 *
+	 * @param {date} date
+	 * @param {String} format
+	 * @returns {String}
+	 */
+	static format(date, format) {
+		return dayjs(date).format(format);
 	}
 }
