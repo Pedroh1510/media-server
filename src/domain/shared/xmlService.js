@@ -1,9 +1,19 @@
-import { XMLBuilder } from 'fast-xml-parser';
+import { XMLBuilder,XMLParser } from 'fast-xml-parser';
 import DateFormatter from '../../utils/dateFormatter.js';
 import CONFIG from '../../infra/config.js';
 
 export default class XmlService {
 	constructor() {}
+
+	/**
+	 * 
+	 * @param {String} xml 
+	 * @returns {Object}
+	 */
+	parserToJson(xml){
+		const instance = new XMLParser()
+		return instance.parse(xml)
+	}
 
 	#makeBody(itens) {
 		return {

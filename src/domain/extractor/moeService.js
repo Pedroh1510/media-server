@@ -1,5 +1,6 @@
 import axios from 'axios';
 import cheerio from 'cheerio';
+import logger from '../../utils/logger.js';
 
 export default class MoeService {
 	constructor() {
@@ -80,7 +81,6 @@ export default class MoeService {
 
 		const mapa = new Set();
 		for (let index = 0; index < total; index++) {
-			console.log(index);
 			mapa.clear();
 			let newurl = '';
 			try {
@@ -90,7 +90,7 @@ export default class MoeService {
 					yield this.#format(item);
 				}
 			} catch (e) {
-				console.log(e);
+				logger.error(e);
 				continue;
 			}
 			if (!newurl) {

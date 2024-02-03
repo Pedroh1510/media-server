@@ -1,4 +1,4 @@
-import parseTorrent from 'parse-torrent';
+import parseTorrent, { toMagnetURI } from 'parse-torrent';
 export default class TorrentService {
 	constructor() {}
 
@@ -10,5 +10,13 @@ export default class TorrentService {
 	async magnetInfo(url) {
 		const data = await parseTorrent(url);
 		return { infoHash: data.infoHash };
+	}
+
+	/**
+	 *
+	 * @param {String} infoHash
+	 */
+	 infoHashToMagnet(infoHash) {
+		return toMagnetURI({infoHash:infoHash})
 	}
 }

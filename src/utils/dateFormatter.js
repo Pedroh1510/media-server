@@ -1,4 +1,6 @@
 import dayjs from 'dayjs';
+import customParseFormat from 'dayjs/plugin/customParseFormat.js';
+dayjs.extend(customParseFormat)
 
 export default class DateFormatter {
 	/**
@@ -19,5 +21,8 @@ export default class DateFormatter {
 	 */
 	static format(date, format) {
 		return dayjs(date).format(format);
+	}
+	static toDate(date, format) {
+		return dayjs(date,format).toDate();
 	}
 }

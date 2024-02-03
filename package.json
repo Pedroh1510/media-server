@@ -20,6 +20,7 @@
 		"fast-xml-parser": "^4.3.2",
 		"libxmljs": "^1.0.11",
 		"parse-torrent": "^11.0.14",
+		"winston": "^3.11.0",
 		"xsd-validator": "^1.1.0"
 	},
 	"devDependencies": {

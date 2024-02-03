@@ -1,5 +1,6 @@
 import { lstat, readdir, rm } from 'node:fs/promises';
 import DateFormatter from '../../utils/dateFormatter.js';
+import logger from '../../utils/logger.js';
 
 export default class AdmService {
 	constructor() {}
@@ -7,7 +8,7 @@ export default class AdmService {
 		const path = './downloads';
 		const maxHourLifeTime = 1;
 		const listFiles = await readdir(path);
-		console.log(`Total files ${listFiles.length}`);
+		logger.info(`Total files ${listFiles.length}`);
 		for (const fileName of listFiles) {
 			const pathFile = `${path}/${fileName}`;
 			const fileInfo = await lstat(pathFile);
@@ -15,7 +16,7 @@ export default class AdmService {
 			const now = Date.now();
 			const diff = DateFormatter.diff(now, fileInfo.ctime, 'hour');
 			if (diff > maxHourLifeTime) {
-				console.log(pathFile);
+				logger.info(pathFile);
 				await rm(pathFile, { force: true });
 			}
 		}

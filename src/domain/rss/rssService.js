@@ -1,4 +1,6 @@
 import CONFIG from '../../infra/config.js';
+import logger from '../../utils/logger.js';
+import ExtractorService from '../extractor/extractorService.js';
 import TorrentService from '../shared/torrentService.js';
 import XmlService from '../shared/xmlService.js';
 import RssRepository from './rssRepository.js';
@@ -8,8 +10,17 @@ export default class RssService {
 		this.repository = new RssRepository();
 		this.xmlService = new XmlService();
 		this.torrentService = new TorrentService();
+		this.extractorService = new ExtractorService();
 	}
-	async list({ term = undefined }) {
+	async list(data) {
+		const  { term:q,t } = data
+		let term = q??t
+		if(term){
+			term = term.replace(/ [sS]\d{1,4}/,'')
+		}
+		logger.info(`List -> with term ${term} -- ${JSON.stringify(data??{})}`)
+		await this.extractorService.extractorRss({q:term})
+
 		const response = await this.repository.list({
 			term,
 			limit: term ? undefined : 10000
@@ -25,6 +36,7 @@ export default class RssService {
 				title: this.#formatTitle(item)
 			});
 		}
+
 		return this.xmlService.buildToRss({ items });
 	}
 
@@ -44,16 +56,16 @@ export default class RssService {
 	#formatTitle({ title }) {
 		const reg = /\dnd Season - (\d){2}/;
 		const result = title.match(reg);
-		// console.log(title.match(/\dnd Season - (\d){2}/));
-		title = title + '[POR]';
+		const titleSplitted = title.split('.')
+		const extention =titleSplitted.pop()
+		title = titleSplitted.join('.')+'[POR]'+`.${extention}`
 		if (result !== null) {
 			const q = result[0];
 			const ep = q.split(' - ').pop();
 			const session = q.split('nd').shift();
-			// console.log({ep,session});>?
-			// return title.replace(reg, ` - Season ${session} - ${ep}`);
-			// return title.replace('Season -', `Season - 2`);
-			return title.replace(q, `${result[0]} - ${session}x${ep}`);
+			title =  title.replace(q, `${result[0]} - ${session}x${ep}`);
+			title = title.replace(reg,'')
+			return title
 		}
 		return title;
 	}

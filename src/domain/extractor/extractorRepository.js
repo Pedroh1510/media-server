@@ -1,4 +1,5 @@
 import { PrismaClient } from '@prisma/client';
+import logger from '../../utils/logger.js';
 
 export default class ExtractorRepository {
 	#prisma = new PrismaClient();
@@ -17,6 +18,6 @@ export default class ExtractorRepository {
 					pubDate: date
 				}
 			})
-			.catch((err) => console.error(`error -- ${err.message}`));
+			.catch(() => {});
 	}
 }
