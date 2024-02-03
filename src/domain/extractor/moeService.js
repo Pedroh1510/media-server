@@ -76,6 +76,7 @@ export default class MoeService {
 	 * @returns {AsyncGenerator<{title:String,link:String,date:Date}>}
 	 */
 	async *extractor(total) {
+		logger.info('Extractor Moe -> start')
 		const urlBase = 'https://magnets.moe';
 		let url = `${urlBase}/new`;
 
@@ -98,5 +99,7 @@ export default class MoeService {
 			}
 			url = `${urlBase}${newurl}`;
 		}
+		
+		logger.info('Extractor Moe -> end')
 	}
 }

@@ -2,6 +2,7 @@ import axios from "axios";
 import XmlService from "../shared/xmlService.js";
 import TorrentService from "../shared/torrentService.js";
 import DateFormatter from "../../utils/dateFormatter.js";
+import logger from "../../utils/logger.js";
 
 export default class NyaaService {
   constructor() {
@@ -35,6 +36,7 @@ export default class NyaaService {
      * @returns {AsyncGenerator<{title:String,link:String,date:Date}>}
     */
    async *extractor() {
+    logger.info('Extractor Nyaa -> start')
     const xml = await this.#searchXml()
     if(!xml) return 
     const json = this.xmlService.parserToJson(xml)
@@ -49,6 +51,8 @@ export default class NyaaService {
         date:DateFormatter.toDate(dateIgnoreWeekday,'DD MMM YYYY HH:mm:ss ZZ')
       }
     }
+    
+    logger.info('Extractor Nyaa -> end')
   }
 
   /**

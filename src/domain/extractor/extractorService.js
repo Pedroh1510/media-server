@@ -30,15 +30,9 @@ export default class ExtractorService {
 		await Promise.all(
 			[
 				executeExtractor(()=>this.moeService.extractor(total)),
-				executeExtractor(()=>this.moeService.extractor(total))
+				executeExtractor(()=>this.nyaaService.extractor(total))
 			]
 		)
-		for await (const item of this.moeService.extractor(total)) {
-			await this.repository.save(item);
-		}
-		for await (const item of this.nyaaService.extractor()) {
-			await this.repository.save(item);
-		}
 		
 		logger.info(`scan -> end`)
 	}
