@@ -18,7 +18,6 @@ export default class ExtractorService {
 	async scan({ total }) {
 		logger.info(`scan -> with total ${total}`)
 
-		// TODO verificar se da para paralelizar
 		/**
 		 * @param {AsyncGenerator} asyncGeneratorFn
 		 */

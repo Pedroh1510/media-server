@@ -17,9 +17,11 @@ export default class NyaaService {
       return axios.get('https://nyaa.si',{
         params:{
           page:'rss',
+          c:"1_0",
           ...objectTerm
         }
       }).then(response=>response.data)
+      .catch(()=>null)
     }
 
     /**
@@ -33,14 +35,13 @@ export default class NyaaService {
      * @returns {AsyncGenerator<{title:String,link:String,date:Date}>}
     */
    async *extractor() {
-    // TODO aplicar tratativa em caso de erro
     const xml = await this.#searchXml()
+    if(!xml) return 
     const json = this.xmlService.parserToJson(xml)
-    const isValidXml = json?.rss&&json.rss?.channel&&json.rss.channel?.item
+    const isValidXml = json?.rss&&json.rss?.channel&&Array.isArray(json.rss.channel?.item)
     if(!isValidXml) return
     for (const item of json.rss.channel.item) {
       if(this.#isAcceptedTitle(item.title)) continue
-      // TODO aplicar o filtro de tipo somente anime
       const dateIgnoreWeekday = item.pubDate.split(', ').slice(1).join(', ')
       yield {
         title:item.title,
@@ -56,14 +57,13 @@ export default class NyaaService {
    * @returns {AsyncGenerator<{title:String,link:String,date:Date}>}
    */
   async *extractorRss(objectTerm) {
-    // TODO aplicar tratativa em caso de erro
     const xml = await this.#searchXml(objectTerm)
+    if(!xml) return 
     const json = this.xmlService.parserToJson(xml)
-    const isValidXml = json?.rss&&json.rss?.channel&&json.rss.channel?.item
+    const isValidXml = json?.rss&&json.rss?.channel&&Array.isArray(json.rss.channel?.item)
     if(!isValidXml) return
     for (const item of json.rss.channel.item) {
       if(this.#isAcceptedTitle(item.title)) continue
-      // TODO aplicar o filtro de tipo somente anime
       const dateIgnoreWeekday = item.pubDate.split(', ').slice(1).join(', ')
       yield {
         title:item.title,
