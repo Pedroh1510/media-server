@@ -1,4 +1,5 @@
 import logger from '../../utils/logger.js';
+import AnimeToshoService from './animeToshoService.js';
 import ExtractorRepository from './extractorRepository.js';
 import MoeService from './moeService.js';
 import NyaaService from './nyaaService.js';
@@ -8,7 +9,21 @@ export default class ExtractorService {
 		this.repository = new ExtractorRepository();
 		this.moeService = new MoeService();
 		this.nyaaService = new NyaaService();
+		this.animeToshoService = new AnimeToshoService();
 	}
+
+	/**
+		 * @param {AsyncGenerator} asyncGeneratorFn
+		 */
+	async #executeExtractor(asyncGeneratorFn){
+		let counter = 0
+		for await (const item of asyncGeneratorFn()) {
+			await this.repository.save(item);
+			counter++
+		}	
+		return counter
+	}
+
 	/**
 	 *
 	 * @param {Object} param
@@ -18,33 +33,26 @@ export default class ExtractorService {
 	async scan({ total }) {
 		logger.info(`scan -> with total ${total}`)
 
-		/**
-		 * @param {AsyncGenerator} asyncGeneratorFn
-		 */
-		const executeExtractor = async(asyncGeneratorFn)=>{
-			for await (const item of asyncGeneratorFn()) {
-				await this.repository.save(item);
-			}	
-		}
-
-		await Promise.all(
+		const responses = await Promise.all(
 			[
-				executeExtractor(()=>this.moeService.extractor(total)),
-				executeExtractor(()=>this.nyaaService.extractor(total))
+				this.#executeExtractor(()=>this.moeService.extractor(total)),
+				this.#executeExtractor(()=>this.nyaaService.extractor()),
+				this.#executeExtractor(()=>this.animeToshoService.extractor())
 			]
 		)
 		
-		logger.info(`scan -> end`)
+		logger.info(`scan -> end ${responses.reduce((p,c)=>p+c,0)}`)
 	}
 
 	async extractorRss(query){
 		if(!query) return
 		logger.info(`extractorRss -> start`)
-		let counter = 0
-		for await (const item of this.nyaaService.extractorRss(query)) {
-			await this.repository.save(item);
-			counter++
-		}	
-		logger.info(`extractorRss -> end ${counter}`)
+		const responses = await Promise.all(
+			[
+				this.#executeExtractor(()=>this.nyaaService.extractor(query)),
+				this.#executeExtractor(()=>this.animeToshoService.extractor(query))
+			]
+		)
+		logger.info(`extractorRss -> end ${responses.reduce((p,c)=>p+c,0)}`)
 	}
 }
