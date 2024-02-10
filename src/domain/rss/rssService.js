@@ -29,12 +29,16 @@ export default class RssService {
 		const items = [];
 
 		for (const item of response) {
-			items.push({
-				...item,
-				page: `http://192.168.0.19:${CONFIG.port}}/${item.id}`,
-				id: await this.torrentService.magnetInfo(item.magnet),
-				title: this.#formatTitle(item)
-			});
+			try {
+				items.push({
+					...item,
+					page: `http://192.168.0.19:${CONFIG.port}}/${item.id}`,
+					id: await this.torrentService.magnetInfo(item.magnet),
+					title: this.#formatTitle(item)
+				});
+			} catch (error) {
+					logger.error(`list item => ${JSON.stringify(item)}`)
+			}
 		}
 
 		return this.xmlService.buildToRss({ items });

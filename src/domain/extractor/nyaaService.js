@@ -47,6 +47,12 @@ export default class NyaaService {
     for (const item of json.rss.channel.item) {
       if(this.#isAcceptedTitle(item.title)) continue
       const dateIgnoreWeekday = item.pubDate.split(', ').slice(1).join(', ')
+      const link = this.torrentService.infoHashToMagnet(item['nyaa:infoHash'])
+      try {
+        await this.torrentService.magnetInfo(link)
+      } catch (error) {
+        continue
+      }
       yield {
         title:item.title,
         link:this.torrentService.infoHashToMagnet(item['nyaa:infoHash']),

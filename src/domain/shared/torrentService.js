@@ -8,8 +8,8 @@ export default class TorrentService {
 	 * @returns {Promise<{infoHash:String}>}
 	 */
 	async magnetInfo(url) {
-		const data = await parseTorrent(url);
-		return { infoHash: data.infoHash };
+			const data = await parseTorrent(url);
+			return { infoHash: data.infoHash };
 	}
 
 	/**
