@@ -3,12 +3,13 @@ import XmlService from "../shared/xmlService.js";
 import TorrentService from "../shared/torrentService.js";
 import DateFormatter from "../../utils/dateFormatter.js";
 import logger from "../../utils/logger.js";
+import { acceptedTags } from "../../utils/constants.js";
 
 export default class NyaaService {
   constructor() {
     this.xmlService = new XmlService()
     this.torrentService = new TorrentService()
-    this.acceptedTags = ['pt-bt', 'por-br','pt-br'];
+    this.acceptedTags = acceptedTags
   }
 
   /**

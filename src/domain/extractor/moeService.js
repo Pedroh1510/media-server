@@ -1,10 +1,11 @@
 import axios from 'axios';
 import cheerio from 'cheerio';
 import logger from '../../utils/logger.js';
+import { acceptedTags } from '../../utils/constants.js';
 
 export default class MoeService {
 	constructor() {
-		this.acceptedTags = ['pt-bt', 'por-br'];
+		this.acceptedTags = acceptedTags
 	}
 
 	/**
