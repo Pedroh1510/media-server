@@ -44,6 +44,23 @@ export default class ExtractorService {
 		logger.info(`scan -> end ${responses.reduce((p,c)=>p+c,0)}`)
 	}
 
+	async scanFull() {
+		logger.info(`scanFull -> start`)
+
+		const responses = await Promise.all(
+			[
+				this.#executeExtractor(()=>this.moeService.extractor()),
+				this.#executeExtractor(()=>this.moeService.extractorAll()),
+				this.#executeExtractor(()=>this.nyaaService.extractor()),
+				this.#executeExtractor(()=>this.animeToshoService.extractor())
+			]
+		)
+		
+		const total = responses.reduce((p,c)=>p+c,0)
+		logger.info(`scanFull -> end ${total}`)
+		return total
+	}
+
 	async extractorRss(query){
 		if(!query) return
 		logger.info(`extractorRss -> start`)

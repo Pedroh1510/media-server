@@ -37,7 +37,7 @@ export default class RssService {
 					title: this.#formatTitle(item)
 				});
 			} catch (error) {
-					logger.error(`list item => ${JSON.stringify(item)}`)
+					// logger.error(`list item => ${JSON.stringify(item)}`)
 			}
 		}
 
