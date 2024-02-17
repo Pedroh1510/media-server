@@ -1,35 +1,21 @@
-import { lstat, readdir, rm } from 'node:fs/promises';
 import DateFormatter from '../../utils/dateFormatter.js';
 import logger from '../../utils/logger.js';
+import BittorrentService from '../../infra/service/bittorrentService.js';
 
 export default class AdmService {
-	constructor() {}
-	async deleteFiles(path='./downloads') {
-		const maxHourLifeTime = 1;
-		const listFiles = await readdir(path);
-		logger.info(`Total files ${listFiles.length}`);
-		for (const fileName of listFiles) {
-			if(fileName.endsWith('.!qB')) continue
-			const pathFile = `${path}/${fileName}`;
-			const fileInfo = await lstat(pathFile);
-			if (fileInfo.isDirectory()) {
-				await this.deleteFiles(pathFile)
-				await this.removeEmptyDir(pathFile)
-				continue
-			};
-			const now = Date.now();
-			const diff = DateFormatter.diff(now, fileInfo.ctime, 'hour');
-			if (diff > maxHourLifeTime) {
-				logger.info(pathFile);
-				await rm(pathFile, { force: true });
-			}
-		}
+	constructor() {
+		this.bittorrentService = new BittorrentService()
 	}
-	async removeEmptyDir(filePath){
-		const fileInfo = await lstat(filePath);
-		if (!fileInfo.isDirectory()) return
-		const listFiles = await readdir(filePath);
-		if(listFiles.length) return
-		await rm(filePath, { force: true,recursive:true });
+	async deleteFiles() {
+		const listTorrents = await this.bittorrentService.listTorrentsConcluded()
+		logger.info(`Total de torrents concluidos ${listTorrents.length}`)
+		const maxHourLifeTime = 2;
+		
+		const listTorrentsConcludedExpired = listTorrents.filter(item=>DateFormatter.diff(Date.now(), item.dateCompleted, 'hour')>maxHourLifeTime)
+		
+		logger.info(`Total de torrents concluidos expirados(${maxHourLifeTime}h): ${listTorrentsConcludedExpired.length}`)
+		if(!listTorrentsConcludedExpired.length) return {total:listTorrents.length,totalDeleted:listTorrentsConcludedExpired.length}
+		await this.bittorrentService.deleteTorrents(listTorrentsConcludedExpired.map(item=>item.hash))
+		return {total:listTorrents.length,totalDeleted:listTorrentsConcludedExpired.length,deleled:listTorrentsConcludedExpired.map(({name})=>name)}
 	}
 }

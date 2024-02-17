@@ -6,8 +6,8 @@ const admRouter = express();
 const admService = new AdmService();
 
 admRouter.get('/delete', async (_req, res) => {
-	await admService.deleteFiles();
-	res.send('ok');
+	const response = await admService.deleteFiles();
+	res.send(response);
 });
 
 export default admRouter;
