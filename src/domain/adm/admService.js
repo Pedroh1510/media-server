@@ -9,8 +9,9 @@ export default class AdmService {
 	async deleteFiles() {
 		const listTorrents = await this.bittorrentService.listTorrentsConcluded()
 		logger.info(`Total de torrents concluidos ${listTorrents.length}`)
+		await this.bittorrentService.stopTorrents(listTorrents.map(({hash})=>hash))
+
 		const maxHourLifeTime = 2;
-		
 		const listTorrentsConcludedExpired = listTorrents.filter(item=>DateFormatter.diff(Date.now(), item.dateCompleted, 'hour')>maxHourLifeTime)
 		
 		logger.info(`Total de torrents concluidos expirados(${maxHourLifeTime}h): ${listTorrentsConcludedExpired.length}`)

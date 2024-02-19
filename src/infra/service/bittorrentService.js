@@ -16,8 +16,9 @@ export default class BittorrentService {
     })).filter(({dateCompleted})=>dateCompleted.getFullYear()>=2024)
   }
   async deleteTorrents(listHashes){
-    for (const hash of listHashes) {
-      await this.client.torrents.delete(hash,true)
-    }
+      await this.client.torrents.delete(listHashes,true)
+  }
+  async stopTorrents(listHashes){
+    await this.client.torrents.pause(listHashes)
   }
 }

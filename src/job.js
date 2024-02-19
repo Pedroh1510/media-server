@@ -21,7 +21,7 @@ export default function jobs() {
 		'America/Los_Angeles' // timeZone
 	);
 	new CronJob(
-		'0 * * * *', // cronTime
+		'0/10 * * * *', // cronTime
 		async function () {
 			logger.info('startCron');
 			try {
