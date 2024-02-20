@@ -1,4 +1,5 @@
 import logger from '../../utils/logger.js';
+import TorrentService from '../shared/torrentService.js';
 import AnimeToshoService from './animeToshoService.js';
 import ExtractorRepository from './extractorRepository.js';
 import MoeService from './moeService.js';
@@ -10,16 +11,20 @@ export default class ExtractorService {
 		this.moeService = new MoeService();
 		this.nyaaService = new NyaaService();
 		this.animeToshoService = new AnimeToshoService();
+		this.torrentService = new TorrentService()
 	}
 
 	/**
-		 * @param {AsyncGenerator} asyncGeneratorFn
+		 * @param {AsyncGenerator<{title:String,link:String,date:Date}>} asyncGeneratorFn
 		 */
 	async #executeExtractor(asyncGeneratorFn){
 		let counter = 0
 		for await (const item of asyncGeneratorFn()) {
-			await this.repository.save(item);
-			counter++
+			try {
+				await this.torrentService.magnetInfo(item.link)
+				await this.repository.save(item);
+				counter++
+			} catch (error) {}
 		}	
 		return counter
 	}

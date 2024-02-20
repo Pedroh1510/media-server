@@ -6,13 +6,14 @@ import { acceptedTags } from '../../utils/constants.js';
 export default class MoeService {
 	constructor() {
 		this.acceptedTags = acceptedTags
+		this.verifyTags = ['multi-sub']
 		this.baseUrl = 'https://magnets.moe'
 	}
 
 	/**
 	 *
 	 * @param {String} url
-	 * @returns {Promise<{nextUrl:String,listData:{title:String,link:String,pubDate:String,hour:String}[]}>}>}
+	 * @returns {Promise<{nextUrl:String,listVerify:String[],listData:{title:String,link:String,pubDate:String,hour:String}[]}>}>}
 	 */
 	async #process(url) {
 		const page = await axios.get(url).then((res) => res.data);
@@ -22,8 +23,11 @@ export default class MoeService {
 		
 
 		const listData = [];
+		const listVerify = [];
 		const isAccept = (text) =>
-			this.acceptedTags.some((tag) => text.includes(tag));
+			this.acceptedTags.some((tag) => text.toLowerCase().includes(tag));
+			const isVerify = (text) =>
+				this.verifyTags.some((tag) => text.toLowerCase().includes(tag));
 		blocks.each(function () {
 			const hour = html(this).text();
 			const pageTags = html(this).find('a');
@@ -53,10 +57,68 @@ export default class MoeService {
 					pubDate: pageDate,
 					hour
 				});
+				return
+			}
+			if(isVerify(text)){
+				pageTags.map((_,item)=>{
+					if(item.attribs?.href && item.attribs.href.startsWith('/torrent/')){	
+				listVerify.push(item.attribs.href)
+					}
+				})
 			}
 		});
 		const nextUrl = html('body > p:nth-child(3) > a:nth-child(2)').attr('href');
-		return { nextUrl, listData };
+		return { nextUrl, listData,listVerify };
+	}
+
+	async #isAcceptInNyaa(url){
+		const page = await axios.get(url).then((res) => res.data);
+		const html = cheerio.load(page);
+		// const tableDescription = html('//*[@id="torrent-description"]/table/tbody');
+		const tableDescription = html('#torrent-description');
+		let isAccept = false
+		const listTags = ['portuguese(brazil)','pt(br)', 'portuguese (brazilian)']
+		for (const item of tableDescription) {
+			if(item.children.length===1){
+				const child = item.children[0]
+				if(!child?.data) continue
+				const text = child.data?.toLowerCase()
+				if(!text) continue
+				const textSplited = text.split('\n').filter(item=>!!item)
+				const subtitle = textSplited.find(item=>item.includes('subtitle'))
+				if(!subtitle) continue
+				if(!listTags.some(tag=>subtitle.includes(tag))) continue
+				isAccept = true
+				break
+			}
+			console.log(item);
+		}
+		return isAccept
+	}
+	async #processPageItem(uri){
+		try{
+		const url = `${this.baseUrl}${uri}`
+		const page = await axios.get(url).then((res) => res.data);
+		const html = cheerio.load(page);
+		const title = html('body > p:nth-child(2) > b').text();
+		const pageDate = html('body > p:nth-child(4)').text();
+		let linkNyaa = null
+		html('body > p:nth-child(5) > a').each((_,item)=>{
+			if(item.attribs?.href&&item.attribs.href.startsWith('https://nyaa')&&!linkNyaa){
+				linkNyaa = item.attribs.href
+			}
+		})
+		const magnet = html('body > p:nth-child(6) > a');
+		if(!magnet.length) return null
+		const link = magnet[0].attribs.href
+		if(!linkNyaa) return null
+		const isAccept = await this.#isAcceptInNyaa(linkNyaa)
+		if(!isAccept) return null
+		const pubDate = pageDate.replace('Upload date: ','')
+		return {title,link,pubDate,hour:pubDate.split(' ')[1]}
+	}catch(error){
+		return null
+	}
 	}
 
 	/**
@@ -87,10 +149,15 @@ export default class MoeService {
 			mapa.clear();
 			let newurl = '';
 			try {
-				const { nextUrl, listData } = await this.#process(url);
+				const { nextUrl, listData,listVerify } = await this.#process(url);
 				if (nextUrl) newurl = nextUrl;
 				for (const item of listData) {
 					yield this.#format(item);
+				}
+				for (const item of listVerify) {
+					const response = await this.#processPageItem(item)
+					if(!response) continue
+					yield this.#format(response)
 				}
 			} catch (e) {
 				logger.error(e);
@@ -125,18 +192,26 @@ export default class MoeService {
 				pubDate: pageDate
 			}
 			try{
+				let uriToPageItem = null
 			for (const child of block.children) {
 				if(child.attribs?.href?.startsWith('magnet:?')){
 					data.link = child.attribs.href
 				}else      if(child.attribs?.href?.startsWith('/torrent')&&child.children?.length){
 						data.title = child.children[0]?.data
+						uriToPageItem = child.attribs.href
 				}else if(regexHour.test(child?.data)){
 					data.hour = regexHour.exec(child.data)[0].replace('|','').trim()
 				}
 			}
 			if(!data.link||!data.title||!data.hour) continue
-			if(!this.acceptedTags.some(tag=>data.title.includes(tag))) continue
-			response.push(data)
+			if(this.acceptedTags.some(tag=>data.title.includes(tag))) {
+				response.push(data)
+			
+			}if(this.verifyTags.some(tag=>data.title.toLowerCase().includes(tag))) {
+				const response = await this.#processPageItem(uriToPageItem)
+				if(!response) continue
+				response.push(response)
+			}
 		}catch(e){
 			continue
 		}
