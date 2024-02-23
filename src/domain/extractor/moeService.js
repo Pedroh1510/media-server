@@ -2,12 +2,12 @@ import axios from 'axios'
 import cheerio, { load } from 'cheerio'
 import logger from '../../utils/logger.js'
 import { acceptedTags } from '../../utils/constants.js'
+import { moeApi } from '../../infra/service/apiService.js'
 
 export default class MoeService {
   constructor () {
     this.acceptedTags = acceptedTags
     this.verifyTags = ['multi-sub']
-    this.baseUrl = 'https://magnets.moe'
   }
 
   /**
@@ -16,7 +16,7 @@ export default class MoeService {
    * @returns {Promise<{nextUrl: string, listVerify: string[], listData: {title: string, link: string, pubDate: string, hour: string}[]}>}>}
    */
   async #process (url) {
-    const page = await axios.get(url).then((res) => res.data)
+    const page = await moeApi.get(url).then((res) => res.data)
     const html = cheerio.load(page)
     const pageDate = html('body > h3').text()
     const blocks = html('body > div')
@@ -97,8 +97,7 @@ export default class MoeService {
 
   async #processPageItem (uri) {
     try {
-      const url = `${this.baseUrl}${uri}`
-      const page = await axios.get(url).then((res) => res.data)
+      const page = await moeApi.get(uri).then((res) => res.data)
       const html = cheerio.load(page)
       const title = html('body > p:nth-child(2) > b').text()
       const pageDate = html('body > p:nth-child(4)').text()
@@ -142,7 +141,7 @@ export default class MoeService {
    */
   async * extractor (total = 3) {
     logger.info('Extractor Moe -> start')
-    let url = `${this.baseUrl}/new`
+    let url = `/new`
 
     const mapa = new Set()
     for (let index = 0; index < total; index++) {
@@ -166,7 +165,7 @@ export default class MoeService {
       if (!newurl) {
         break
       }
-      url = `${this.baseUrl}${newurl}`
+      url = `${newurl}`
     }
 
     logger.info('Extractor Moe -> end')
@@ -176,7 +175,7 @@ export default class MoeService {
     let page = null
     for (let i = 0; i < 3; i++) {
       try {
-        page = await axios.get(`${this.baseUrl}${uri}`).then((res) => res.data)
+        page = await moeApi.get(uri).then((res) => res.data)
         break
       } catch (error) {
       }
@@ -221,8 +220,8 @@ export default class MoeService {
     return response.concat(await this.#processInPageShow(nextUrl))
   }
 
-  async #listHref (baseUrl) {
-    const page = await axios.get(`${baseUrl}/shows`).then((res) => res.data)
+  async #listHref () {
+    const page = await moeApi.get(`/shows`).then((res) => res.data)
     const html = load(page)
     const blocks = html('body > div:nth-child(4)')
     const listHref = new Set()
@@ -250,7 +249,7 @@ export default class MoeService {
    */
   async * extractorAll () {
     logger.info('extractorAll - start')
-    const list = await this.#listHref(this.baseUrl)
+    const list = await this.#listHref()
     const limit = 10
     const promises = []
     logger.info(`extractorAll - total ${list.length}`)
