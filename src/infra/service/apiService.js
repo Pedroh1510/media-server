@@ -7,3 +7,6 @@ export const moeApi = axios.create({
 export const nyaaApi = axios.create({
   baseURL:'https://nyaa.si'
 })
+export const animeToshoApi = axios.create({
+  baseURL:'https://feed.animetosho.org/rss2'
+})

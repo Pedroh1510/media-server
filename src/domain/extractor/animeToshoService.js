@@ -1,9 +1,9 @@
-import axios from 'axios'
 import XmlService from '../shared/xmlService.js'
 import TorrentService from '../shared/torrentService.js'
 import DateFormatter from '../../utils/dateFormatter.js'
 import logger from '../../utils/logger.js'
 import { acceptedTags } from '../../utils/constants.js'
+import { animeToshoApi } from '../../infra/service/apiService.js'
 
 export default class AnimeToshoService {
   constructor () {
@@ -16,7 +16,7 @@ export default class AnimeToshoService {
    * @param {string} term
    */
   async #searchXml (term = undefined) {
-    return axios.get('https://feed.animetosho.org/rss2', {
+    return animeToshoApi.get('', {
       params: {
         only_tor: '1',
         reversepolarity: 1,
