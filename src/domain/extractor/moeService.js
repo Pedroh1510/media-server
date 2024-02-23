@@ -87,7 +87,7 @@ export default class MoeService {
 				const textSplited = text.split('\n').filter(item=>!!item)
 				const subtitle = textSplited.find(item=>item.includes('subtitle'))
 				if(!subtitle) continue
-				if(!listTags.some(tag=>subtitle.includes(tag))) continue
+				if(!listTags.some(tag=>subtitle.replace(/\*/gm,'').includes(tag))) continue
 				isAccept = true
 				break
 			}
