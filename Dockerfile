@@ -22,5 +22,5 @@ COPY . .
 ENV port=3333
 EXPOSE 3333
 
-CMD [ "node","src/server.js" ]
+CMD [ "npm","run","start" ]
 # linux/amd64,linux/arm64,linux/arm64/v8

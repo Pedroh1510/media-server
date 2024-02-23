@@ -3,18 +3,9 @@ services:
   rss:
     # image: do
     build: .
-    container_name: teste
-    command: node src/server.js
+    container_name: rss
     ports:
       - 4000:4000
     environment:
       - port=4000
       - DATABASE_URL=file:./dev.db
-  onvif:
-    image: kerberos/kerberos
-    container_name: onvif
-    ports:
-      - 8889:8889
-      - 8081:80
-
-  
