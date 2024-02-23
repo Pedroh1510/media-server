@@ -1,6 +1,7 @@
 import { XMLBuilder, XMLParser } from 'fast-xml-parser'
-import DateFormatter from '../../utils/dateFormatter.js'
+
 import CONFIG from '../../infra/config.js'
+import DateFormatter from '../../utils/dateFormatter.js'
 
 export default class XmlService {
   /**
@@ -8,12 +9,12 @@ export default class XmlService {
    * @param {string} xml
    * @returns {object}
    */
-  parserToJson (xml) {
+  parserToJson(xml) {
     const instance = new XMLParser()
     return instance.parse(xml)
   }
 
-  #makeBody (itens) {
+  #makeBody(itens) {
     return {
       rss: {
         '@_xmlns:atom': 'http://www.w3.org/2005/Atom',
@@ -26,26 +27,23 @@ export default class XmlService {
           'atom:link': {
             '@_href': `http://localhost:${CONFIG.port}`,
             '@_rel': 'self',
-            '@_type': 'application/rss+xml'
+            '@_type': 'application/rss+xml',
           },
           language: 'en',
-          item: itens
-        }
-      }
+          item: itens,
+        },
+      },
     }
   }
 
-  #makeItem ({ magnet, page, pubDate, title, id }) {
-    const dateFormatted = DateFormatter.format(
-      pubDate,
-      'ddd, DD MMM YYYY HH:mm:ss -0000'
-    )
+  #makeItem({ magnet, page, pubDate, title, id }) {
+    const dateFormatted = DateFormatter.format(pubDate, 'ddd, DD MMM YYYY HH:mm:ss -0000')
     return {
       title,
       // link: page,
       link: magnet,
       guid: {
-        '#text': page
+        '#text': page,
       },
       // Sat, 11 Nov 2023 11:47:01 -0000
       // pubDate: `Fri, 10 Nov 2023 16:28:00 -0000`,
@@ -60,7 +58,8 @@ export default class XmlService {
       'nyaa:comments': 0,
       'nyaa:trusted': 'No',
       'nyaa:remake': 'No',
-      description: '<a href="https://nyaa.si/view/1741283">#1741283 | 私にだけテンパる上司の話 第01-02巻</a> | 249.0 MiB | Literature - Raw | 4403A1C9A781FDD47E2F33914D599569CA05DA95'
+      description:
+        '<a href="https://nyaa.si/view/1741283">#1741283 | 私にだけテンパる上司の話 第01-02巻</a> | 249.0 MiB | Literature - Raw | 4403A1C9A781FDD47E2F33914D599569CA05DA95',
     }
   }
 
@@ -69,15 +68,13 @@ export default class XmlService {
    * @param {{page: string, id: string, title: string}[]} param.items
    * @returns {string}
    */
-  buildToRss ({ items }) {
+  buildToRss({ items }) {
     const builder = new XMLBuilder({
       // arrayNodeName: 'item',
       ignoreAttributes: false,
       // preserveOrder: true,
-      format: true
+      format: true,
     })
-    return builder.build(
-      this.#makeBody(items.map((item) => this.#makeItem({ ...item })))
-    )
+    return builder.build(this.#makeBody(items.map((item) => this.#makeItem({ ...item }))))
   }
 }

@@ -1,12 +1,12 @@
-import XmlService from '../shared/xmlService.js'
-import TorrentService from '../shared/torrentService.js'
+import { nyaaApi } from '../../infra/service/apiService.js'
+import { acceptedTags } from '../../utils/constants.js'
 import DateFormatter from '../../utils/dateFormatter.js'
 import logger from '../../utils/logger.js'
-import { acceptedTags } from '../../utils/constants.js'
-import { nyaaApi } from '../../infra/service/apiService.js'
+import TorrentService from '../shared/torrentService.js'
+import XmlService from '../shared/xmlService.js'
 
 export default class NyaaService {
-  constructor () {
+  constructor() {
     this.xmlService = new XmlService()
     this.torrentService = new TorrentService()
     this.acceptedTags = acceptedTags
@@ -15,21 +15,23 @@ export default class NyaaService {
   /**
    * @param {string} term
    */
-  async #searchXml (term) {
-    return nyaaApi.get("/", {
-      params: {
-        page: 'rss',
-        c: '1_0',
-        q: term
-      }
-    }).then(response => response.data)
+  async #searchXml(term) {
+    return nyaaApi
+      .get('/', {
+        params: {
+          page: 'rss',
+          c: '1_0',
+          q: term,
+        },
+      })
+      .then((response) => response.data)
       .catch(() => null)
   }
 
   /**
    * @param {string} title
    */
-  #isAcceptedTitle (title) {
+  #isAcceptedTitle(title) {
     return !this.acceptedTags.some((tag) => title.toLowerCase().includes(tag))
   }
 
@@ -37,7 +39,7 @@ export default class NyaaService {
    * @param {string} term
    * @returns {AsyncGenerator<{title: string, link: string, date: Date}>}
    */
-  async * extractor (term) {
+  async *extractor(term) {
     logger.info('Extractor Nyaa -> start')
     const xml = await this.#searchXml(term)
     if (!xml) return
@@ -56,7 +58,7 @@ export default class NyaaService {
       yield {
         title: item.title,
         link: this.torrentService.infoHashToMagnet(item['nyaa:infoHash']),
-        date: DateFormatter.toDate(dateIgnoreWeekday, 'DD MMM YYYY HH:mm:ss ZZ')
+        date: DateFormatter.toDate(dateIgnoreWeekday, 'DD MMM YYYY HH:mm:ss ZZ'),
       }
     }
 

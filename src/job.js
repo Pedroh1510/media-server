@@ -11,7 +11,7 @@ const extractorService = new ExtractorService()
 /**
  *
  */
-export default function jobs () {
+export default function jobs() {
   logger.info('start jobs')
   new CronJob(
     '30 * * * *', // cronTime

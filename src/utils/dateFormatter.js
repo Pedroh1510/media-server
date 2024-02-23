@@ -10,7 +10,7 @@ export default class DateFormatter {
    * @param {('hour'|'minute'|'day')} unit unidade de comparação
    * @returns {number}
    */
-  static diff (date, date2, unit = 'h') {
+  static diff(date, date2, unit = 'h') {
     return dayjs(date).diff(dayjs(date2), unit)
   }
 
@@ -20,11 +20,11 @@ export default class DateFormatter {
    * @param {string} format
    * @returns {string}
    */
-  static format (date, format) {
+  static format(date, format) {
     return dayjs(date).format(format)
   }
 
-  static toDate (date, format) {
+  static toDate(date, format) {
     return dayjs(date, format).toDate()
   }
 }

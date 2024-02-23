@@ -2,8 +2,8 @@ import { networkInterfaces } from 'node:os'
 
 export default class OSService {
   static getIp() {
-    const nets = networkInterfaces();
-    const results = Object.create(null); // Or just '{}', an empty object
+    const nets = networkInterfaces()
+    const results = Object.create(null) // Or just '{}', an empty object
 
     for (const name of Object.keys(nets)) {
       for (const net of nets[name]) {
@@ -12,12 +12,12 @@ export default class OSService {
         const familyV4Value = typeof net.family === 'string' ? 'IPv4' : 4
         if (net.family === familyV4Value && !net.internal) {
           if (!results[name]) {
-            results[name] = [];
+            results[name] = []
           }
-          results[name].push(net.address);
+          results[name].push(net.address)
         }
       }
     }
-    return results.end0??'localhost'
+    return results.end0 ?? 'localhost'
   }
 }

@@ -1,11 +1,12 @@
 import axios from 'axios'
-import cheerio, { load } from 'cheerio'
-import logger from '../../utils/logger.js'
-import { acceptedTags } from '../../utils/constants.js'
+import { load } from 'cheerio'
+
 import { moeApi } from '../../infra/service/apiService.js'
+import { acceptedTags } from '../../utils/constants.js'
+import logger from '../../utils/logger.js'
 
 export default class MoeService {
-  constructor () {
+  constructor() {
     this.acceptedTags = acceptedTags
     this.verifyTags = ['multi-sub']
   }
@@ -15,18 +16,16 @@ export default class MoeService {
    * @param {string} url
    * @returns {Promise<{nextUrl: string, listVerify: string[], listData: {title: string, link: string, pubDate: string, hour: string}[]}>}>}
    */
-  async #process (url) {
+  async #process(url) {
     const page = await moeApi.get(url).then((res) => res.data)
-    const html = cheerio.load(page)
+    const html = load(page)
     const pageDate = html('body > h3').text()
     const blocks = html('body > div')
 
     const listData = []
     const listVerify = []
-    const isAccept = (text) =>
-      this.acceptedTags.some((tag) => text.toLowerCase().includes(tag))
-    const isVerify = (text) =>
-      this.verifyTags.some((tag) => text.toLowerCase().includes(tag))
+    const isAccept = (text) => this.acceptedTags.some((tag) => text.toLowerCase().includes(tag))
+    const isVerify = (text) => this.verifyTags.some((tag) => text.toLowerCase().includes(tag))
     blocks.each(function () {
       const hour = html(this).text()
       const pageTags = html(this).find('a')
@@ -54,7 +53,7 @@ export default class MoeService {
           title: paragraphs[1],
           link: paragraphs[0],
           pubDate: pageDate,
-          hour
+          hour,
         })
         return
       }
@@ -71,9 +70,9 @@ export default class MoeService {
     return { nextUrl, listData, listVerify }
   }
 
-  async #isAcceptInNyaa (url) {
+  async #isAcceptInNyaa(url) {
     const page = await axios.get(url).then((res) => res.data)
-    const html = cheerio.load(page)
+    const html = load(page)
     // const tableDescription = html('//*[@id="torrent-description"]/table/tbody');
     const tableDescription = html('#torrent-description')
     let isAccept = false
@@ -84,10 +83,10 @@ export default class MoeService {
         if (!child?.data) continue
         const text = child.data?.toLowerCase()
         if (!text) continue
-        const textSplited = text.split('\n').filter(item => !!item)
-        const subtitle = textSplited.find(item => item.includes('subtitle'))
+        const textSplited = text.split('\n').filter((item) => !!item)
+        const subtitle = textSplited.find((item) => item.includes('subtitle'))
         if (!subtitle) continue
-        if (!listTags.some(tag => subtitle.replace(/\*/gm, '').includes(tag))) continue
+        if (!listTags.some((tag) => subtitle.replace(/\*/gm, '').includes(tag))) continue
         isAccept = true
         break
       }
@@ -95,10 +94,10 @@ export default class MoeService {
     return isAccept
   }
 
-  async #processPageItem (uri) {
+  async #processPageItem(uri) {
     try {
       const page = await moeApi.get(uri).then((res) => res.data)
-      const html = cheerio.load(page)
+      const html = load(page)
       const title = html('body > p:nth-child(2) > b').text()
       const pageDate = html('body > p:nth-child(4)').text()
       let linkNyaa = null
@@ -124,13 +123,13 @@ export default class MoeService {
    * @param {{title: string, link: string, pubDate: string, hour: string}} param
    * @returns {{title: string, link: string, date: Date}}
    */
-  #format ({ hour, link, pubDate, title }) {
+  #format({ hour, link, pubDate, title }) {
     const date = pubDate.substring(0, 10)
     const dateFormatted = new Date(`${date} ${hour.substring(0, 5)}:00:000z`)
     return {
       date: dateFormatted,
       link,
-      title
+      title,
     }
   }
 
@@ -139,7 +138,7 @@ export default class MoeService {
    * @param {number} total
    * @returns {AsyncGenerator<undefined,{title: string, link: string, date: Date}>}
    */
-  async * extractor (total = 3) {
+  async *extractor(total = 3) {
     logger.info('Extractor Moe -> start')
     let url = `/new`
 
@@ -171,25 +170,26 @@ export default class MoeService {
     logger.info('Extractor Moe -> end')
   }
 
-  async #processInPageShow (uri) {
+  async #processInPageShow(uri) {
     let page = null
     for (let i = 0; i < 3; i++) {
       try {
         page = await moeApi.get(uri).then((res) => res.data)
         break
-      } catch (error) {
-      }
+      } catch (error) {}
     }
     if (!page) throw new Error('Falha na busca')
     const html = load(page)
     const pageDate = html('body > h3').first().text()
     const blocksAll = html('body > div')
-    const blocks = blocksAll.filter((_, block) => block.children.some(child => child?.attribs?.href && child.attribs?.href.startsWith('magnet:?')))
+    const blocks = blocksAll.filter((_, block) =>
+      block.children.some((child) => child?.attribs?.href && child.attribs?.href.startsWith('magnet:?'))
+    )
     const regexHour = /(\d){2}:(\d){2} \|/
     const response = []
     for (const block of blocks) {
       const data = {
-        pubDate: pageDate
+        pubDate: pageDate,
       }
       try {
         let uriToPageItem = null
@@ -204,9 +204,10 @@ export default class MoeService {
           }
         }
         if (!data.link || !data.title || !data.hour) continue
-        if (this.acceptedTags.some(tag => data.title.includes(tag))) {
+        if (this.acceptedTags.some((tag) => data.title.includes(tag))) {
           response.push(data)
-        } if (this.verifyTags.some(tag => data.title.toLowerCase().includes(tag))) {
+        }
+        if (this.verifyTags.some((tag) => data.title.toLowerCase().includes(tag))) {
           const response = await this.#processPageItem(uriToPageItem)
           if (!response) continue
           response.push(response)
@@ -220,7 +221,7 @@ export default class MoeService {
     return response.concat(await this.#processInPageShow(nextUrl))
   }
 
-  async #listHref () {
+  async #listHref() {
     const page = await moeApi.get(`/shows`).then((res) => res.data)
     const html = load(page)
     const blocks = html('body > div:nth-child(4)')
@@ -240,14 +241,13 @@ export default class MoeService {
       const w = parseInt(a.split('/').pop())
       const q = parseInt(b.split('/').pop())
       return w - q
-    }
-    )
+    })
   }
 
   /**
    * @returns {AsyncGenerator<{}[]>}
    */
-  async * extractorAll () {
+  async *extractorAll() {
     logger.info('extractorAll - start')
     const list = await this.#listHref()
     const limit = 10

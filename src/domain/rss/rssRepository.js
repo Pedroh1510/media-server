@@ -2,13 +2,13 @@ import { PrismaClient } from '@prisma/client'
 
 export default class RssRepository {
   #prisma = new PrismaClient()
-  async list ({ term = undefined, limit = undefined }) {
+  async list({ term = undefined, limit = undefined }) {
     let where
     if (term) {
       where = {
         title: {
-          contains: term.split(/s\d/)[0].trim()
-        }
+          contains: term.split(/s\d/)[0].trim(),
+        },
       }
     }
 
@@ -16,20 +16,20 @@ export default class RssRepository {
       take: limit,
       where,
       orderBy: {
-        pubDate: 'desc'
-      }
+        pubDate: 'desc',
+      },
     })
   }
 
-  async listAll () {
+  async listAll() {
     return this.#prisma.torrent.findMany({
       orderBy: {
-        pubDate: 'desc'
-      }
+        pubDate: 'desc',
+      },
     })
   }
 
-  async count () {
+  async count() {
     return this.#prisma.torrent.count({})
   }
 }

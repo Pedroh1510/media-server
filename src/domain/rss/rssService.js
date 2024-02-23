@@ -6,14 +6,14 @@ import XmlService from '../shared/xmlService.js'
 import RssRepository from './rssRepository.js'
 
 export default class RssService {
-  constructor () {
+  constructor() {
     this.repository = new RssRepository()
     this.xmlService = new XmlService()
     this.torrentService = new TorrentService()
     this.extractorService = new ExtractorService()
   }
 
-  async list (data) {
+  async list(data) {
     const { term: q, t } = data
     let term = q ?? t
     if (term) {
@@ -24,7 +24,7 @@ export default class RssService {
 
     const response = await this.repository.list({
       term,
-      limit: term ? undefined : 10000
+      limit: term ? undefined : 10000,
     })
 
     const items = []
@@ -35,7 +35,7 @@ export default class RssService {
           ...item,
           page: `http://192.168.0.19:${CONFIG.port}}/${item.id}`,
           id: await this.torrentService.magnetInfo(item.magnet),
-          title: this.#formatTitle(item)
+          title: this.#formatTitle(item),
         })
       } catch (error) {
         // logger.error(`list item => ${JSON.stringify(item)}`)
@@ -45,11 +45,11 @@ export default class RssService {
     return this.xmlService.buildToRss({ items })
   }
 
-  async listAll () {
+  async listAll() {
     return this.repository.listAll()
   }
 
-  async count () {
+  async count() {
     return { total: await this.repository.count() }
   }
 
@@ -58,7 +58,7 @@ export default class RssService {
    * @param {{title:string}} param0
    * @returns {string}
    */
-  #formatTitle ({ title }) {
+  #formatTitle({ title }) {
     const reg = /\dnd Season - (\d){2}/
     const result = title.match(reg)
     const titleSplitted = title.split('.')

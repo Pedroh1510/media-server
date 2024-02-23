@@ -7,14 +7,14 @@ export default class ExtractorRepository {
    *
    * @param {{title: string, link: string, date: Date}} param
    */
-  async save ({ title, date, link }) {
+  async save({ title, date, link }) {
     await this.#prisma.torrent
       .create({
         data: {
           title,
           magnet: link,
-          pubDate: date
-        }
+          pubDate: date,
+        },
       })
       .catch(() => {})
   }

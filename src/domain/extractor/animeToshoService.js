@@ -1,12 +1,12 @@
-import XmlService from '../shared/xmlService.js'
-import TorrentService from '../shared/torrentService.js'
+import { animeToshoApi } from '../../infra/service/apiService.js'
+import { acceptedTags } from '../../utils/constants.js'
 import DateFormatter from '../../utils/dateFormatter.js'
 import logger from '../../utils/logger.js'
-import { acceptedTags } from '../../utils/constants.js'
-import { animeToshoApi } from '../../infra/service/apiService.js'
+import TorrentService from '../shared/torrentService.js'
+import XmlService from '../shared/xmlService.js'
 
 export default class AnimeToshoService {
-  constructor () {
+  constructor() {
     this.xmlService = new XmlService()
     this.torrentService = new TorrentService()
     this.acceptedTags = acceptedTags
@@ -15,14 +15,16 @@ export default class AnimeToshoService {
   /**
    * @param {string} term
    */
-  async #searchXml (term = undefined) {
-    return animeToshoApi.get('', {
-      params: {
-        only_tor: '1',
-        reversepolarity: 1,
-        q: term
-      }
-    }).then(response => response.data)
+  async #searchXml(term = undefined) {
+    return animeToshoApi
+      .get('', {
+        params: {
+          only_tor: '1',
+          reversepolarity: 1,
+          q: term,
+        },
+      })
+      .then((response) => response.data)
       .catch((e) => {
         return null
       })
@@ -31,21 +33,21 @@ export default class AnimeToshoService {
   /**
    * @param {string} title
    */
-  #isAcceptedTitle (title) {
+  #isAcceptedTitle(title) {
     const titleLow = title.toLowerCase()
     return this.acceptedTags.some((tag) => titleLow.includes(tag))
   }
 
-  #getMagnetLink (description = '') {
+  #getMagnetLink(description = '') {
     const array = description.split('"')
-    return array.find(item => item.includes('magnet:'))
+    return array.find((item) => item.includes('magnet:'))
   }
 
   /**
    * @param term
    * @returns {AsyncGenerator<{title: string, link: string, date: Date}>}
    */
-  async * extractor (term = undefined) {
+  async *extractor(term = undefined) {
     logger.info('Extractor AnimeTosho -> start')
     const xml = await this.#searchXml(term)
     if (!xml) {
@@ -71,7 +73,7 @@ export default class AnimeToshoService {
       yield {
         title: item.title,
         link,
-        date: DateFormatter.toDate(dateIgnoreWeekday, 'DD MMM YYYY HH:mm:ss ZZ')
+        date: DateFormatter.toDate(dateIgnoreWeekday, 'DD MMM YYYY HH:mm:ss ZZ'),
       }
     }
 
