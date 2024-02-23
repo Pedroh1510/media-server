@@ -1,1 +1,1 @@
-export const acceptedTags = ['pt-bt', 'por-br','pt-br', 'portuguese']
+export const acceptedTags = ['pt-bt', 'por-br', 'pt-br', 'portuguese']

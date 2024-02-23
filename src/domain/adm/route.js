@@ -1,13 +1,13 @@
-import express from 'express';
-import AdmService from './admService.js';
+import express from 'express'
+import AdmService from './admService.js'
 
-const admRouter = express();
+const admRouter = express()
 
-const admService = new AdmService();
+const admService = new AdmService()
 
 admRouter.get('/delete', async (_req, res) => {
-	const response = await admService.deleteFiles();
-	res.send(response);
-});
+  const response = await admService.deleteFiles()
+  res.send(response)
+})
 
-export default admRouter;
+export default admRouter
