@@ -1,9 +1,9 @@
-import axios from 'axios'
 import XmlService from '../shared/xmlService.js'
 import TorrentService from '../shared/torrentService.js'
 import DateFormatter from '../../utils/dateFormatter.js'
 import logger from '../../utils/logger.js'
 import { acceptedTags } from '../../utils/constants.js'
+import { nyaaApi } from '../../infra/service/apiService.js'
 
 export default class NyaaService {
   constructor () {
@@ -16,7 +16,7 @@ export default class NyaaService {
    * @param {string} term
    */
   async #searchXml (term) {
-    return axios.get('https://nyaa.si', {
+    return nyaaApi.get("/", {
       params: {
         page: 'rss',
         c: '1_0',
