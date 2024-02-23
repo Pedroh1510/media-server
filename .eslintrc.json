@@ -7,9 +7,6 @@
         "standard",
         "prettier"
     ],
-    "plugins": [
-        "jsdoc"
-    ],
     "parserOptions": {
         "ecmaVersion": "latest",
         "sourceType": "module"

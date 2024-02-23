@@ -5,7 +5,9 @@
 	"main": "a.js",
 	"type": "module",
 	"scripts": {
-		"lint": "eslint . --fix"
+		"lint": "eslint . --fix",
+		"autogen": "node src/infra/swagger/autogen.js",
+		"start":"npm run autogen && node src/server.js"
 	},
 	"keywords": [],
 	"author": "",
@@ -15,6 +17,7 @@
 		"@robertklep/qbittorrent": "^1.0.1",
 		"axios": "^1.6.1",
 		"cheerio": "^1.0.0-rc.12",
+		"cors": "^2.8.5",
 		"cron": "^3.1.6",
 		"dayjs": "^1.11.10",
 		"dotenv-safe": "^9.0.0",
@@ -34,6 +37,9 @@
 		"eslint-plugin-n": "^16.6.2",
 		"eslint-plugin-promise": "^6.1.1",
 		"prettier": "^3.2.5",
-		"prisma": "^5.5.2"
+		"prisma": "^5.5.2",
+		"swagger-autogen": "^2.23.7",
+		"swagger-ui-dist": "^5.11.7",
+		"swagger-ui-express": "^5.0.0"
 	}
 }
