@@ -3,14 +3,13 @@ import { resolve } from 'node:path'
 import swaggerAutogen from 'swagger-autogen'
 
 import CONFIG from '../config.js'
-import OSService from '../service/osService.js'
 
 const doc = {
   info: {
     title: 'My API',
     description: 'Description',
   },
-  host: `${OSService.getIp()}:${CONFIG.port}`,
+  host: `${CONFIG.host}:${CONFIG.port}`,
 }
 
 const outputFile = './swagger-output.json'
