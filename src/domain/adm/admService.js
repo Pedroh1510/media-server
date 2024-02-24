@@ -1,8 +1,14 @@
+import { PassThrough, Readable } from 'node:stream'
+
 import BittorrentService from '../../infra/service/bittorrentService.js'
 import DateFormatter from '../../utils/dateFormatter.js'
 import logger from '../../utils/logger.js'
+import CsvService from '../shared/csvService.js'
+import AdmRepository from './admRepository.js'
 
 export default class AdmService {
+  #repository = new AdmRepository()
+  #csvService = new CsvService()
   constructor() {
     this.bittorrentService = new BittorrentService()
   }
@@ -25,6 +31,16 @@ export default class AdmService {
       total: listTorrents.length,
       totalDeleted: listTorrentsConcludedExpired.length,
       deleled: listTorrentsConcludedExpired.map(({ name }) => name),
+    }
+  }
+
+  exportData() {
+    const read = Readable.from(this.#repository.listAll())
+    return {
+      fileName: 'data.csv',
+      stream: read
+        .pipe(this.#csvService.jsonToCsvStream({ streamData: read, objectMode: true }))
+        .pipe(new PassThrough()),
     }
   }
 }

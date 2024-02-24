@@ -1,8 +1,9 @@
 import winston from 'winston'
-const { combine, timestamp, printf, colorize, align } = winston.format
+const { combine, timestamp, printf, colorize, align, errors } = winston.format
 
 const logger = winston.createLogger({
   format: combine(
+    errors({ stack: true }),
     colorize({ all: true }),
     timestamp({
       format: 'DD/MM/YYYY HH:mm:ss.SSS ',

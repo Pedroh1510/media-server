@@ -164,3 +164,4 @@ dist
 
 downloads
 *.db
+swagger-output.json
