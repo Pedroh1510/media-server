@@ -1,5 +1,5 @@
-import { config } from 'dotenv-safe'
-config()
+// import { config } from 'dotenv-safe'
+// config()
 
 const CONFIG = {
   port: process.env.port || 3000,

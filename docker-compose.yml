@@ -86,6 +86,8 @@ services:
       - host=localhost
       - TZ=${TZ}
       - DATABASE_URL=file:./dev.db
+    env_file:
+      - .env
     volumes:
       - ${DATA}/rss:/app/prisma/
       - ${DATA}/downloads:/app/downloads
