@@ -1,4 +1,5 @@
-import { PassThrough, Readable } from 'node:stream'
+import { PassThrough, Readable, Writable } from 'node:stream'
+import { pipeline } from 'node:stream/promises'
 
 import BittorrentService from '../../infra/service/bittorrentService.js'
 import DateFormatter from '../../utils/dateFormatter.js'
@@ -42,5 +43,33 @@ export default class AdmService {
         .pipe(this.#csvService.jsonToCsvStream({ streamData: read, objectMode: true }))
         .pipe(new PassThrough()),
     }
+  }
+
+  async deleteRss() {
+    await this.#repository.deleteAll()
+  }
+
+  /**
+   *
+   * @param {Object} param
+   * @param {Readable} param.fileStream
+   */
+  async importData({ fileStream }) {
+    let totalInserted = 0
+    await pipeline(
+      fileStream,
+      this.#csvService.csvToJson(),
+      new Writable({
+        objectMode: true,
+        write: async (c, _, cb) => {
+          await this.#repository
+            .insert(c)
+            .then(() => totalInserted++)
+            .catch(() => {})
+          cb(null)
+        },
+      })
+    )
+    return { totalInserted }
   }
 }

@@ -20,4 +20,18 @@ export default class AdmRepository {
   async count() {
     return this.#prisma.torrent.count({})
   }
+
+  async insert({ magnet, pubDate, title }) {
+    await this.#prisma.torrent.create({
+      data: {
+        magnet,
+        pubDate,
+        title,
+      },
+    })
+  }
+
+  async deleteAll() {
+    await this.#prisma.torrent.deleteMany()
+  }
 }

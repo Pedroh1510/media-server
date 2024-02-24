@@ -1,4 +1,5 @@
 import { Transform } from '@json2csv/node'
+import csvParser from 'csv-parser'
 export default class CsvService {
   jsonToCsvStream({ delimiter = '|', objectMode = false, decodeStrings = false, ndjson = false }) {
     return new Transform(
@@ -14,5 +15,9 @@ export default class CsvService {
       { objectMode },
       { objectMode, decodeStrings }
     )
+  }
+
+  csvToJson() {
+    return csvParser({ separator: '|' })
   }
 }
