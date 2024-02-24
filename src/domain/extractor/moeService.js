@@ -1,14 +1,14 @@
-import axios from 'axios'
 import { load } from 'cheerio'
 
 import { moeApi } from '../../infra/service/apiService.js'
 import { acceptedTags } from '../../utils/constants.js'
 import logger from '../../utils/logger.js'
+import NyaaService from './nyaaService.js'
 
 export default class MoeService {
+  #nyaaService = new NyaaService()
   constructor() {
     this.acceptedTags = acceptedTags
-    this.verifyTags = ['multi-sub']
   }
 
   /**
@@ -25,7 +25,7 @@ export default class MoeService {
     const listData = []
     const listVerify = []
     const isAccept = (text) => this.acceptedTags.some((tag) => text.toLowerCase().includes(tag))
-    const isVerify = (text) => this.verifyTags.some((tag) => text.toLowerCase().includes(tag))
+    const isVerify = (data) => this.#nyaaService.isVerify(data)
     blocks.each(function () {
       const hour = html(this).text()
       const pageTags = html(this).find('a')
@@ -70,30 +70,6 @@ export default class MoeService {
     return { nextUrl, listData, listVerify }
   }
 
-  async #isAcceptInNyaa(url) {
-    const page = await axios.get(url).then((res) => res.data)
-    const html = load(page)
-    // const tableDescription = html('//*[@id="torrent-description"]/table/tbody');
-    const tableDescription = html('#torrent-description')
-    let isAccept = false
-    const listTags = ['portuguese(brazil)', 'pt(br)', 'portuguese (brazilian)']
-    for (const item of tableDescription) {
-      if (item.children.length === 1) {
-        const child = item.children[0]
-        if (!child?.data) continue
-        const text = child.data?.toLowerCase()
-        if (!text) continue
-        const textSplited = text.split('\n').filter((item) => !!item)
-        const subtitle = textSplited.find((item) => item.includes('subtitle'))
-        if (!subtitle) continue
-        if (!listTags.some((tag) => subtitle.replace(/\*/gm, '').includes(tag))) continue
-        isAccept = true
-        break
-      }
-    }
-    return isAccept
-  }
-
   async #processPageItem(uri) {
     try {
       const page = await moeApi.get(uri).then((res) => res.data)
@@ -110,7 +86,7 @@ export default class MoeService {
       if (!magnet.length) return null
       const link = magnet[0].attribs.href
       if (!linkNyaa) return null
-      const isAccept = await this.#isAcceptInNyaa(linkNyaa)
+      const isAccept = await this.#nyaaService.isAcceptInNyaa(linkNyaa)
       if (!isAccept) return null
       const pubDate = pageDate.replace('Upload date: ', '')
       return { title, link, pubDate, hour: pubDate.split(' ')[1] }
@@ -207,7 +183,7 @@ export default class MoeService {
         if (this.acceptedTags.some((tag) => data.title.includes(tag))) {
           response.push(data)
         }
-        if (this.verifyTags.some((tag) => data.title.toLowerCase().includes(tag))) {
+        if (this.#nyaaService.isVerify(data.title)) {
           const response = await this.#processPageItem(uriToPageItem)
           if (!response) continue
           response.push(response)

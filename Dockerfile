@@ -9,7 +9,7 @@ RUN apk upgrade --update-cache --available && \
   rm -rf /var/cache/apk/*
 COPY package* .
 COPY prisma ./prisma/
-COPY .env ./
+ENV DATABASE_URL="file:./dev.db"
 
 RUN npm ci --silent
 RUN npx prisma migrate deploy

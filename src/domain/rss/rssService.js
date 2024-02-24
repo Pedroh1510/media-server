@@ -61,9 +61,6 @@ export default class RssService {
   #formatTitle({ title }) {
     const reg = /\dnd Season - (\d){2}/
     const result = title.match(reg)
-    const titleSplitted = title.split('.')
-    const extention = titleSplitted.pop()
-    title = titleSplitted.join('.') + '[POR]' + `.${extention}`
     if (result !== null) {
       const q = result[0]
       const ep = q.split(' - ').pop()
