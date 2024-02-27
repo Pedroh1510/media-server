@@ -6,5 +6,6 @@ const CONFIG = {
   host: process.env.host || 'localhost',
   userTorrent: process.env.user_torrent,
   passTorrent: process.env.pass_torrent,
+  loki: process.env.loki,
 }
 export default CONFIG

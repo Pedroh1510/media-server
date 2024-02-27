@@ -28,6 +28,7 @@
     "parse-torrent": "^11.0.14",
     "qbittorrent-api-v2": "^1.2.2",
     "winston": "^3.11.0",
+    "winston-loki": "^6.0.8",
     "xsd-validator": "^1.1.0"
   },
   "devDependencies": {

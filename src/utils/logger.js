@@ -1,4 +1,7 @@
 import winston from 'winston'
+import LokiTransport from 'winston-loki'
+
+import CONFIG from '../infra/config.js'
 const { combine, timestamp, printf, colorize, align, errors } = winston.format
 
 const logger = winston.createLogger({
@@ -12,9 +15,9 @@ const logger = winston.createLogger({
     printf((info) => `[${info.timestamp}] ${info.level}: ${info.message}`)
   ),
   level: 'info',
-  transports: [new winston.transports.Console()],
-  exceptionHandlers: [new winston.transports.Console()],
-  rejectionHandlers: [new winston.transports.Console()],
+  transports: [new winston.transports.Console(), new LokiTransport({ host: CONFIG.loki, batching: false })],
+  exceptionHandlers: [new winston.transports.Console(), new LokiTransport({ host: CONFIG.loki, batching: false })],
+  rejectionHandlers: [new winston.transports.Console(), new LokiTransport({ host: CONFIG.loki, batching: false })],
 })
 
 export default logger
