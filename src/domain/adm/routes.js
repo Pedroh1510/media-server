@@ -42,4 +42,33 @@ admRouter.post(
   /* #swagger.tags = ["ADM"] */
 )
 
+const asyncWrapper = (fn) => (req, res, next) => Promise.resolve(fn(req, res, next)).catch((err) => next(err))
+admRouter.post(
+  '/tags',
+  asyncWrapper(async (req, res) => {
+    await admService.insertTags({ ...req.body })
+    res.status(201).end()
+  })
+  /* #swagger.tags = ["ADM"]
+  #swagger.path = '/tags'
+  #swagger.parameters['tags'] = {
+    in: 'body',
+    required: true,
+    schema: { 
+      $acceptedTags:[],
+      $verifyTags:[]
+     }
+  } 
+  */
+)
+
+admRouter.get(
+  '/tags',
+  async (req, res) => {
+    const data = await admService.listTags()
+    res.send(data)
+  }
+  /* #swagger.tags = ["ADM"] */
+)
+
 export default admRouter

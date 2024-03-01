@@ -3,12 +3,14 @@ import { load } from 'cheerio'
 import { moeApi } from '../../infra/service/apiService.js'
 import { acceptedTags } from '../../utils/constants.js'
 import logger from '../../utils/logger.js'
+import ExtractorRepository from './extractorRepository.js'
 import NyaaService from './nyaaService.js'
 
 export default class MoeService {
   #nyaaService = new NyaaService()
   constructor() {
     this.acceptedTags = acceptedTags
+    this.repository = new ExtractorRepository()
   }
 
   /**
@@ -117,6 +119,11 @@ export default class MoeService {
   async *extractor(total = 3) {
     logger.info('Extractor Moe -> start')
     let url = `/new`
+
+    const { accepted, verify } = await this.repository.listTags()
+    this.acceptedTags = accepted.map((item) => item.tag)
+    this.#nyaaService.verifyTags = verify.map((item) => item.tag)
+    this.#nyaaService.acceptedTags = this.acceptedTags
 
     const mapa = new Set()
     for (let index = 0; index < total; index++) {

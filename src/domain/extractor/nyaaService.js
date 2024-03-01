@@ -2,18 +2,19 @@ import axios from 'axios'
 import { load } from 'cheerio'
 
 import { nyaaApi } from '../../infra/service/apiService.js'
-import { acceptedTags } from '../../utils/constants.js'
 import DateFormatter from '../../utils/dateFormatter.js'
 import logger from '../../utils/logger.js'
 import TorrentService from '../shared/torrentService.js'
 import XmlService from '../shared/xmlService.js'
+import ExtractorRepository from './extractorRepository.js'
 
 export default class NyaaService {
   constructor() {
     this.xmlService = new XmlService()
     this.torrentService = new TorrentService()
-    this.acceptedTags = acceptedTags
-    this.verifyTags = ['multi-sub']
+    this.repository = new ExtractorRepository()
+    this.acceptedTags = []
+    this.verifyTags = []
   }
 
   /**
@@ -54,6 +55,9 @@ export default class NyaaService {
     const json = this.xmlService.parserToJson(xml)
     const isValidXml = json?.rss && json.rss?.channel && Array.isArray(json.rss.channel?.item)
     if (!isValidXml) return
+    const { accepted, verify } = await this.repository.listTags()
+    this.verifyTags = verify.map((item) => item.tag)
+    this.acceptedTags = accepted.map((item) => item.tag)
     const isVerify = (text) => this.verifyTags.some((tag) => text.toLowerCase().includes(tag))
     for (const item of json.rss.channel.item) {
       if (!this.#isAcceptedTitle(item.title)) {

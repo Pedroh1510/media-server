@@ -18,4 +18,11 @@ export default class ExtractorRepository {
       })
       .catch(() => {})
   }
+
+  async listTags() {
+    return {
+      accepted: await this.#prisma.acceptedTags.findMany({ select: { tag: true } }),
+      verify: await this.#prisma.verifyTags.findMany({ select: { tag: true } }),
+    }
+  }
 }

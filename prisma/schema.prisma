@@ -16,3 +16,13 @@ model Torrent {
   title   String   @unique
   pubDate DateTime
 }
+
+model AcceptedTags {
+  id  Int    @id @default(autoincrement())
+  tag String @unique
+}
+
+model VerifyTags {
+  id  Int    @id @default(autoincrement())
+  tag String @unique
+}

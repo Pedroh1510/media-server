@@ -1,15 +1,16 @@
 import { animeToshoApi } from '../../infra/service/apiService.js'
-import { acceptedTags } from '../../utils/constants.js'
 import DateFormatter from '../../utils/dateFormatter.js'
 import logger from '../../utils/logger.js'
 import TorrentService from '../shared/torrentService.js'
 import XmlService from '../shared/xmlService.js'
+import ExtractorRepository from './extractorRepository.js'
 
 export default class AnimeToshoService {
   constructor() {
     this.xmlService = new XmlService()
     this.torrentService = new TorrentService()
-    this.acceptedTags = acceptedTags
+    this.repository = new ExtractorRepository()
+    this.acceptedTags = []
   }
 
   /**
@@ -60,6 +61,8 @@ export default class AnimeToshoService {
       logger.info('Extractor AnimeTosho -> end')
       return
     }
+    const { accepted } = await this.repository.listTags()
+    this.acceptedTags = accepted.map((item) => item.tag)
     for (const item of json.rss.channel.item) {
       if (!this.#isAcceptedTitle(item.title)) continue
       if (!this.#getMagnetLink(item.description)) continue

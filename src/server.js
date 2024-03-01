@@ -10,6 +10,8 @@ import jobs from './job.js'
 import logger from './utils/logger.js'
 
 const server = express()
+server.use(express.json({}))
+server.use(express.urlencoded({ extended: true }))
 
 server.use(
   cors({
@@ -24,6 +26,15 @@ server.use(rssRouter)
 server.use(extractorRouter)
 
 server.use(admRouter)
+
+function error(err, req, res, next) {
+  logger.error({ err })
+
+  res.status(500)
+  res.send('Internal Server Error')
+}
+
+server.use(error)
 
 server.listen(CONFIG.port, () => logger.info(`listen ${CONFIG.port}`))
 

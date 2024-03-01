@@ -34,4 +34,20 @@ export default class AdmRepository {
   async deleteAll() {
     await this.#prisma.torrent.deleteMany()
   }
+
+  async insertAcceptedTags(data) {
+    await this.#prisma.acceptedTags.createMany({ data })
+  }
+
+  async insertVerifyTags(data) {
+    await this.#prisma.verifyTags.createMany({ data })
+  }
+
+  async listAcceptedTags() {
+    return this.#prisma.acceptedTags.findMany({ select: { tag: true } })
+  }
+
+  async listVerifyTags() {
+    return this.#prisma.verifyTags.findMany({ select: { tag: true } })
+  }
 }
