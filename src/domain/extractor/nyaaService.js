@@ -58,24 +58,51 @@ export default class NyaaService {
     const { accepted, verify } = await this.repository.listTags()
     this.verifyTags = verify.map((item) => item.tag)
     this.acceptedTags = accepted.map((item) => item.tag)
-    const isVerify = (text) => this.verifyTags.some((tag) => text.toLowerCase().includes(tag))
-    for (const item of json.rss.channel.item) {
+    // const isVerify = (text) => this.verifyTags.some((tag) => text.toLowerCase().includes(tag))
+    const promises = []
+    const processItem = async (item) => {
       if (!this.#isAcceptedTitle(item.title)) {
-        if (!isVerify(item.title)) continue
+        // if (!isVerify(item.title)) continue
         const isValid = await this.isAcceptInNyaa(item.link)
-        if (!isValid) continue
+        if (!isValid) return null
       }
       const dateIgnoreWeekday = item.pubDate.split(', ').slice(1).join(', ')
       const link = this.torrentService.infoHashToMagnet(item['nyaa:infoHash'])
       try {
         await this.torrentService.magnetInfo(link)
       } catch (error) {
-        continue
+        return null
       }
-      yield {
+
+      return {
         title: item.title,
         link: this.torrentService.infoHashToMagnet(item['nyaa:infoHash']),
         date: DateFormatter.toDate(dateIgnoreWeekday, 'DD MMM YYYY HH:mm:ss ZZ'),
+      }
+    }
+    const maxParallelRequest = 5
+    for (const item of json.rss.channel.item) {
+      promises.push(processItem(item))
+      if (promises.length >= maxParallelRequest) {
+        const responses = await Promise.all(promises)
+        for (const response of responses) {
+          if (!response) continue
+          yield response
+        }
+        promises.length = 0
+      }
+
+      // yield {
+      //   title: item.title,
+      //   link: this.torrentService.infoHashToMagnet(item['nyaa:infoHash']),
+      //   date: DateFormatter.toDate(dateIgnoreWeekday, 'DD MMM YYYY HH:mm:ss ZZ'),
+      // }
+    }
+    if (promises.length) {
+      const responses = await Promise.all(promises)
+      for (const response of responses) {
+        if (!response) continue
+        yield response
       }
     }
 
@@ -89,7 +116,7 @@ export default class NyaaService {
       // const tableDescription = html('//*[@id="torrent-description"]/table/tbody');
       const tableDescription = html('#torrent-description')
       let isAccept = false
-      const listTags = ['portuguese(brazil)', 'pt(br)', 'portuguese (brazilian)', 'portuguese[br]']
+      const listTags = this.acceptedTags
       for (const item of tableDescription) {
         if (item.children.length === 1) {
           const child = item.children[0]
