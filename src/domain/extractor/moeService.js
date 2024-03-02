@@ -27,7 +27,7 @@ export default class MoeService {
     const listData = []
     const listVerify = []
     const isAccept = (text) => this.acceptedTags.some((tag) => text.toLowerCase().includes(tag))
-    // const isVerify = (data) => this.#nyaaService.isVerify(data)
+    const isVerify = (data) => this.#nyaaService.isVerify(data)
     blocks.each(function () {
       const hour = html(this).text()
       const pageTags = html(this).find('a')
@@ -59,14 +59,14 @@ export default class MoeService {
         })
         return
       }
-      // if (isVerify(text)) {
-      // eslint-disable-next-line array-callback-return
-      pageTags.map((_, item) => {
-        if (item.attribs?.href && item.attribs.href.startsWith('/torrent/')) {
-          listVerify.push(item.attribs.href)
-        }
-      })
-      // }
+      if (isVerify(text)) {
+        // eslint-disable-next-line array-callback-return
+        pageTags.map((_, item) => {
+          if (item.attribs?.href && item.attribs.href.startsWith('/torrent/')) {
+            listVerify.push(item.attribs.href)
+          }
+        })
+      }
     })
     const nextUrl = html('body > p:nth-child(3) > a:nth-child(2)').attr('href')
     return { nextUrl, listData, listVerify }
@@ -170,7 +170,8 @@ export default class MoeService {
     )
     const regexHour = /(\d){2}:(\d){2} \|/
     const response = []
-    for (const block of blocks) {
+    const promises = []
+    const processBlock = async (block) => {
       const data = {
         pubDate: pageDate,
       }
@@ -186,19 +187,28 @@ export default class MoeService {
             data.hour = regexHour.exec(child.data)[0].replace('|', '').trim()
           }
         }
-        if (!data.link || !data.title || !data.hour) continue
+        if (!data.link || !data.title || !data.hour) return null
         if (this.acceptedTags.some((tag) => data.title.includes(tag))) {
           response.push(data)
+          return null
         }
-        if (this.#nyaaService.isVerify(data.title)) {
-          const response = await this.#processPageItem(uriToPageItem)
-          if (!response) continue
-          response.push(response)
-        }
+        // if (this.#nyaaService.isVerify(data.title)) {
+        const result = await this.#processPageItem(uriToPageItem)
+        if (!result) return null
+        response.push(result)
+        // }
       } catch (e) {
-        continue
+        return null
       }
     }
+    for (const block of blocks) {
+      promises.push(processBlock(block))
+      if (promises.length >= 10) {
+        await Promise.all(promises)
+        promises.length = 0
+      }
+    }
+    await Promise.all(promises)
     const nextUrl = html('body > p:nth-child(8) > a:nth-child(2)').attr('href')
     if (!nextUrl) return response
     return response.concat(await this.#processInPageShow(nextUrl))
@@ -233,7 +243,7 @@ export default class MoeService {
   async *extractorAll() {
     logger.info('extractorAll - start')
     const list = await this.#listHref()
-    const limit = 10
+    const limit = 20
     const promises = []
     logger.info(`extractorAll - total ${list.length}`)
     for (let index = 0; index < list.length; index++) {
