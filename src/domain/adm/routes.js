@@ -37,7 +37,7 @@ admRouter.get(
 admRouter.post(
   '/import-data',
   async (req, res) => {
-    req.setTimeout(1000 * 60 * 10)
+    req.setTimeout(0)
     const data = await admService.importData({ fileStream: req })
     res.send(data)
   }
