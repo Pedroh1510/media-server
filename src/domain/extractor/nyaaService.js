@@ -58,11 +58,11 @@ export default class NyaaService {
     const { accepted, verify } = await this.repository.listTags()
     this.verifyTags = verify.map((item) => item.tag)
     this.acceptedTags = accepted.map((item) => item.tag)
-    // const isVerify = (text) => this.verifyTags.some((tag) => text.toLowerCase().includes(tag))
+    const isVerify = (text) => this.verifyTags.some((tag) => text.toLowerCase().includes(tag))
     const promises = []
     const processItem = async (item) => {
       if (!this.#isAcceptedTitle(item.title)) {
-        // if (!isVerify(item.title)) continue
+        if (!isVerify(item.title)) return null
         const isValid = await this.isAcceptInNyaa(item.link)
         if (!isValid) return null
       }

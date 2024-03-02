@@ -27,7 +27,7 @@ export default class MoeService {
     const listData = []
     const listVerify = []
     const isAccept = (text) => this.acceptedTags.some((tag) => text.toLowerCase().includes(tag))
-    const isVerify = (data) => this.#nyaaService.isVerify(data)
+    // const isVerify = (data) => this.#nyaaService.isVerify(data)
     blocks.each(function () {
       const hour = html(this).text()
       const pageTags = html(this).find('a')
@@ -59,14 +59,14 @@ export default class MoeService {
         })
         return
       }
-      if (isVerify(text)) {
-        // eslint-disable-next-line array-callback-return
-        pageTags.map((_, item) => {
-          if (item.attribs?.href && item.attribs.href.startsWith('/torrent/')) {
-            listVerify.push(item.attribs.href)
-          }
-        })
-      }
+      // if (isVerify(text)) {
+      // eslint-disable-next-line array-callback-return
+      pageTags.map((_, item) => {
+        if (item.attribs?.href && item.attribs.href.startsWith('/torrent/')) {
+          listVerify.push(item.attribs.href)
+        }
+      })
+      // }
     })
     const nextUrl = html('body > p:nth-child(3) > a:nth-child(2)').attr('href')
     return { nextUrl, listData, listVerify }
