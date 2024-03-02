@@ -25,7 +25,8 @@ admRouter.get(
 
 admRouter.get(
   '/export-data',
-  async (_req, res) => {
+  async (req, res) => {
+    req.setTimeout(1000 * 60 * 10)
     const { fileName, stream } = admService.exportData()
     res.attachment(fileName)
     stream.pipe(res)
@@ -36,6 +37,7 @@ admRouter.get(
 admRouter.post(
   '/import-data',
   async (req, res) => {
+    req.setTimeout(1000 * 60 * 10)
     const data = await admService.importData({ fileStream: req })
     res.send(data)
   }
