@@ -6,6 +6,7 @@
   "type": "module",
   "scripts": {
     "lint": "eslint . --fix",
+    "test": "vitest",
     "autogen": "node src/infra/swagger/autogen.js",
     "start": "npm run autogen && node src/server.js"
   },
@@ -45,6 +46,7 @@
     "prisma": "^5.5.2",
     "swagger-autogen": "^2.23.7",
     "swagger-ui-dist": "^5.11.7",
-    "swagger-ui-express": "^5.0.0"
+    "swagger-ui-express": "^5.0.0",
+    "vitest": "^1.3.1"
   }
 }
