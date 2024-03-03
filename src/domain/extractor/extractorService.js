@@ -40,7 +40,7 @@ export default class ExtractorService {
 
     const responses = await Promise.all([
       this.#executeExtractor(() => this.moeService.extractor(total)),
-      this.#executeExtractor(() => this.nyaaService.extractor(undefined, true)),
+      this.#executeExtractor(() => this.nyaaService.extractor(undefined, false)),
       this.#executeExtractor(() => this.animeToshoService.extractor()),
     ])
 
