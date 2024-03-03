@@ -46,9 +46,10 @@ export default class NyaaService {
 
   /**
    * @param {string} term
+   * @param {boolean} processAllItems
    * @returns {AsyncGenerator<{title: string, link: string, date: Date}>}
    */
-  async *extractor(term) {
+  async *extractor(term, processAllItems = false) {
     logger.info('Extractor Nyaa -> start')
     const xml = await this.#searchXml(term)
     if (!xml) return
@@ -62,7 +63,7 @@ export default class NyaaService {
     const promises = []
     const processItem = async (item) => {
       if (!this.#isAcceptedTitle(item.title)) {
-        if (!isVerify(item.title)) return null
+        if (!isVerify(item.title) && !processAllItems) return null
         const isValid = await this.isAcceptInNyaa(item.link)
         if (!isValid) return null
       }
