@@ -81,7 +81,7 @@ export default class NyaaService {
         date: DateFormatter.toDate(dateIgnoreWeekday, 'DD MMM YYYY HH:mm:ss ZZ'),
       }
     }
-    const maxParallelRequest = 5
+    const maxParallelRequest = 1
     for (const item of json.rss.channel.item) {
       promises.push(processItem(item))
       if (promises.length >= maxParallelRequest) {
