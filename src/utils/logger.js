@@ -14,24 +14,30 @@ const formatLog = () =>
     align(),
     printf((info) => `[${info.timestamp}] ${info.level}: ${info.message}`)
   )
-const makeTransportLoki = () =>
-  new LokiTransport({
-    host: CONFIG.loki,
-    batching: false,
-    gracefulShutdown: true,
-    format: formatLog(),
-    replaceTimestamp: true,
-    labels: {
-      job: 'rss',
-    },
-  })
+
+const makeTransportLoki = () => {
+  try {
+    return new LokiTransport({
+      host: CONFIG.loki,
+      batching: false,
+      gracefulShutdown: true,
+      format: formatLog(),
+      replaceTimestamp: true,
+      labels: {
+        job: 'rss',
+      },
+    })
+  } catch (e) {
+    return new winston.transports.Console()
+  }
+}
 
 const logger = winston.createLogger({
   format: formatLog(),
   level: 'info',
-  transports: [new winston.transports.Console(), makeTransportLoki()],
-  exceptionHandlers: [new winston.transports.Console(), makeTransportLoki()],
-  rejectionHandlers: [new winston.transports.Console(), makeTransportLoki()],
+  transports: [makeTransportLoki()],
+  exceptionHandlers: [makeTransportLoki()],
+  rejectionHandlers: [makeTransportLoki()],
 })
 
 export default logger
