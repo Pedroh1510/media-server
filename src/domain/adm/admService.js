@@ -80,12 +80,12 @@ export default class AdmService {
    * @param {String[]} param.verifyTags
    */
   async insertTags({ acceptedTags, verifyTags }) {
-    if (acceptedTags) {
+    if (acceptedTags && acceptedTags.length) {
       if (!Array.isArray(acceptedTags)) throw new Error('acceptedTags deve ser um array')
       if (!acceptedTags.length) throw new Error('acceptedTags n deve ser vazio')
       await this.#repository.insertAcceptedTags(acceptedTags.map((tag) => ({ tag }))).catch(() => {})
     }
-    if (verifyTags) {
+    if (verifyTags && verifyTags.length) {
       if (!Array.isArray(verifyTags)) throw new Error('verifyTags deve ser um array')
       if (!verifyTags.length) throw new Error('verifyTags n deve ser vazio')
       await this.#repository.insertVerifyTags(verifyTags.map((tag) => ({ tag }))).catch(() => {})

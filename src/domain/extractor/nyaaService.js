@@ -21,12 +21,14 @@ export default class NyaaService {
    * @param {string} term
    */
   async #searchXml(term) {
+    const query = term?.q ?? term
+    const q = !query ? undefined : query
     return nyaaApi
       .get('/', {
         params: {
           page: 'rss',
           c: '1_0',
-          q: term,
+          q,
         },
       })
       .then((response) => response.data)
@@ -57,8 +59,9 @@ export default class NyaaService {
     const xml = await this.#searchXml(term)
     if (!xml) return
     const json = this.xmlService.parserToJson(xml)
-    const isValidXml = json?.rss && json.rss?.channel && Array.isArray(json.rss.channel?.item)
+    const isValidXml = json?.rss && json.rss?.channel && json.rss.channel?.item !== undefined
     if (!isValidXml) return
+    if (!Array.isArray(json.rss.channel?.item)) json.rss.channel.item = [json.rss.channel?.item]
     const { accepted, verify } = await this.repository.listTags()
     this.verifyTags = verify.map((item) => item.tag)
     this.acceptedTags = accepted.map((item) => item.tag)
@@ -67,7 +70,8 @@ export default class NyaaService {
     const processItem = async (item) => {
       if (!this.#isAcceptedTitle(item.title)) {
         if (!isVerify(item.title) && !processAllItems) return null
-        const isValid = await this.isAcceptInNyaa(item.link)
+        const link = item.link.includes('.torrent') ? item.guid : item.link
+        const isValid = await this.isAcceptInNyaa(link)
         if (!isValid) return null
       }
       const dateIgnoreWeekday = item.pubDate.split(', ').slice(1).join(', ')
@@ -119,7 +123,6 @@ export default class NyaaService {
       const html = load(page)
       // const tableDescription = html('//*[@id="torrent-description"]/table/tbody');
       const tableDescription = html('#torrent-description')
-      let isAccept = false
       const listTags = this.acceptedTags
       for (const item of tableDescription) {
         if (item.children.length === 1) {
@@ -131,11 +134,10 @@ export default class NyaaService {
           const subtitle = textSplited.find((item) => item.includes('subtitle'))
           if (!subtitle) continue
           if (!listTags.some((tag) => subtitle.replace(/\*/gm, '').includes(tag))) continue
-          isAccept = true
-          break
+          return true
         }
       }
-      return isAccept
+      return false
     } catch (error) {
       return false
     }
