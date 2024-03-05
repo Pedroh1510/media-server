@@ -62,11 +62,11 @@ export default class ExtractorService {
     return total
   }
 
-  async extractorRss(query) {
+  async extractorRss(query, scanAllItems = false) {
     if (!query) return
     logger.info('extractorRss -> start')
     const responses = await Promise.all([
-      this.#executeExtractor(() => this.nyaaService.extractor(query)),
+      this.#executeExtractor(() => this.nyaaService.extractor(query, scanAllItems)),
       this.#executeExtractor(() => this.animeToshoService.extractor(query)),
     ])
     logger.info(`extractorRss -> end ${responses.reduce((p, c) => p + c, 0)}`)

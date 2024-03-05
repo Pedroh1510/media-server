@@ -22,6 +22,10 @@ rssRouter.get(
   in: 'query',
   type: 'string'
 }
+#swagger.parameters['scanAllItems'] = {
+  in: 'query',
+  type: 'boolean'
+}
 */
 )
 
