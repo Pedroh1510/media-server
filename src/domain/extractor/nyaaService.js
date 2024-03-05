@@ -30,7 +30,10 @@ export default class NyaaService {
         },
       })
       .then((response) => response.data)
-      .catch(() => null)
+      .catch((e) => {
+        logger.error(e)
+        return null
+      })
   }
 
   /**
