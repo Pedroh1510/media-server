@@ -4,12 +4,13 @@ import swaggerAutogen from 'swagger-autogen'
 
 import CONFIG from '../config.js'
 
+const host = CONFIG.host.includes(':') ? CONFIG.host : `${CONFIG.host}:${CONFIG.port}`
 const doc = {
   info: {
     title: 'My API',
     description: 'Description',
   },
-  host: `${CONFIG.host}:${CONFIG.port}`,
+  host,
   schemes: ['http'],
   basePath: '/',
   consumes: ['application/json'],
