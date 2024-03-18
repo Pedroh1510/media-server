@@ -11,7 +11,7 @@ const doc = {
     description: 'Description',
   },
   host,
-  schemes: ['http'],
+  schemes: ['http', 'https'],
   basePath: '/',
   consumes: ['application/json'],
   produces: ['application/json'],
