@@ -10,6 +10,9 @@ export default class XmlService {
    * @returns {object}
    */
   parserToJson(xml) {
+    if (xml === null || xml === undefined) {
+      return {}
+    }
     const instance = new XMLParser()
     return instance.parse(xml)
   }
@@ -65,7 +68,7 @@ export default class XmlService {
 
   /**
    * @param {object} param
-   * @param {{page: string, id: string, title: string}[]} param.items
+   * @param {{page: string, id: string, title: string,pubDate:string, magnet:string }[]} param.items
    * @returns {string}
    */
   buildToRss({ items }) {
