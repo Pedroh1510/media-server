@@ -3,14 +3,23 @@ import logger from '../../utils/logger.js'
 import ExtractorService from '../extractor/extractorService.js'
 import TorrentService from '../shared/torrentService.js'
 import XmlService from '../shared/xmlService.js'
-import RssRepository from './rssRepository.js'
+import RssRepository from './repository/rssRepository.js'
 
 export default class RssService {
-  constructor() {
-    this.repository = new RssRepository()
-    this.xmlService = new XmlService()
-    this.torrentService = new TorrentService()
-    this.extractorService = new ExtractorService()
+  constructor(
+    services = {
+      xmlService: new XmlService(),
+      torrentService: new TorrentService(),
+      extractorService: new ExtractorService(),
+    },
+    repositories = {
+      rssRepository: new RssRepository(),
+    }
+  ) {
+    this.xmlService = services.xmlService
+    this.torrentService = services.torrentService
+    this.extractorService = services.extractorService
+    this.repository = repositories.rssRepository
   }
 
   async list(data) {
