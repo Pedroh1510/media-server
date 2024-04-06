@@ -5,13 +5,21 @@ import BittorrentService from '../../infra/service/bittorrentService.js'
 import DateFormatter from '../../utils/dateFormatter.js'
 import logger from '../../utils/logger.js'
 import CsvService from '../shared/csvService.js'
-import AdmRepository from './admRepository.js'
+import AdmRepository from './repository/admRepository.js'
 
 export default class AdmService {
-  #repository = new AdmRepository()
-  #csvService = new CsvService()
-  constructor() {
-    this.bittorrentService = new BittorrentService()
+  constructor(
+    service = {
+      csvService: new CsvService(),
+      bittorrentService: new BittorrentService(),
+    },
+    repository = {
+      repository: new AdmRepository(),
+    }
+  ) {
+    this.csvService = service.csvService
+    this.bittorrentService = service.bittorrentService
+    this.repository = repository.repository
   }
 
   async deleteFiles() {
@@ -36,17 +44,17 @@ export default class AdmService {
   }
 
   exportData() {
-    const read = Readable.from(this.#repository.listAll())
+    const read = Readable.from(this.repository.listAll())
     return {
       fileName: 'data.csv',
       stream: read
-        .pipe(this.#csvService.jsonToCsvStream({ streamData: read, objectMode: true }))
+        .pipe(this.csvService.jsonToCsvStream({ streamData: read, objectMode: true }))
         .pipe(new PassThrough()),
     }
   }
 
   async deleteRss() {
-    await this.#repository.deleteAll()
+    await this.repository.deleteAll()
   }
 
   /**
@@ -58,11 +66,11 @@ export default class AdmService {
     let totalInserted = 0
     await pipeline(
       fileStream,
-      this.#csvService.csvToJson(),
+      this.csvService.csvToJson(),
       new Writable({
         objectMode: true,
         write: async (c, _, cb) => {
-          await this.#repository
+          await this.repository
             .insert(c)
             .then(() => totalInserted++)
             .catch(() => {})
@@ -83,19 +91,19 @@ export default class AdmService {
     if (acceptedTags && acceptedTags.length) {
       if (!Array.isArray(acceptedTags)) throw new Error('acceptedTags deve ser um array')
       if (!acceptedTags.length) throw new Error('acceptedTags n deve ser vazio')
-      await this.#repository.insertAcceptedTags(acceptedTags.map((tag) => ({ tag }))).catch(() => {})
+      await this.repository.insertAcceptedTags(acceptedTags.map((tag) => ({ tag }))).catch(() => {})
     }
     if (verifyTags && verifyTags.length) {
       if (!Array.isArray(verifyTags)) throw new Error('verifyTags deve ser um array')
       if (!verifyTags.length) throw new Error('verifyTags n deve ser vazio')
-      await this.#repository.insertVerifyTags(verifyTags.map((tag) => ({ tag }))).catch(() => {})
+      await this.repository.insertVerifyTags(verifyTags.map((tag) => ({ tag }))).catch(() => {})
     }
   }
 
   async listTags() {
     return {
-      verifyTags: await this.#repository.listVerifyTags(),
-      acceptedTags: await this.#repository.listAcceptedTags(),
+      verifyTags: await this.repository.listVerifyTags(),
+      acceptedTags: await this.repository.listAcceptedTags(),
     }
   }
 }
