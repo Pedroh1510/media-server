@@ -4,12 +4,12 @@ import Selector from './components/selector'
 import { AppBar, Box, Checkbox, Fab, Toolbar } from '@mui/material'
 import ScrollTop from './components/scrollTop'
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
-
+const url = import.meta.env.VITE_URL
 /**
  * @returns {Promise<{data:Buffer, name:String}[]>}
  */
 async function imagesApi(mangaId, chapterId) {
-  return axios.get(`http://localhost:3000/mangas/${mangaId}/${chapterId}/images`).then((res) => res?.data)
+  return axios.get(`${url}/mangas/${mangaId}/${chapterId}/images`).then((res) => res?.data)
 }
 /**
  * @typedef {{name:String,id:String}} Chapter
@@ -17,11 +17,11 @@ async function imagesApi(mangaId, chapterId) {
  * @returns {Promise<Manga[]>}
  */
 async function mangasApi() {
-  return axios.get('http://localhost:3000/mangas').then((res) => res.data)
+  return axios.get(`${url}/mangas`).then((res) => res.data)
 }
 
 async function updateChapter({ chapterId, read, error }) {
-  await axios.patch(`http://localhost:3000/mangas/chapter/${chapterId}`, { read, error })
+  await axios.patch(`${url}/mangas/chapter/${chapterId}`, { read, error })
 }
 
 function App(props) {
