@@ -4,7 +4,7 @@ import Selector from './components/selector'
 import { AppBar, Box, Checkbox, Fab, Toolbar } from '@mui/material'
 import ScrollTop from './components/scrollTop'
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
-const url = import.meta.env.VITE_URL
+const url = window.location.origin
 /**
  * @returns {Promise<{data:Buffer, name:String}[]>}
  */
