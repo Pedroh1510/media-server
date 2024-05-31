@@ -12,13 +12,13 @@ on:
         required: true
       TOKEN:
         required: true
-  workflow_dispatch: 
+  workflow_dispatch:
   push:
-    branches: [ "main" ]
+    branches: ["main"]
     # Publish semver tags as releases.
-    tags: [ 'v*.*.*' ]
+    tags: ["v*.*.*"]
   pull_request:
-    branches: [ "main" ]
+    branches: ["main"]
 
 env:
   # Use docker.io for Docker Hub if empty
@@ -26,10 +26,8 @@ env:
   # github.repository as <account>/<repo>
   IMAGE_NAME: pedroh1510/rss
 
-
 jobs:
   build:
-
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -48,7 +46,7 @@ jobs:
         if: github.event_name != 'pull_request'
         uses: sigstore/cosign-installer@6e04d228eb30da1757ee4e1dd75a0ec73a653e06 #v3.1.1
         with:
-          cosign-release: 'v2.1.1'
+          cosign-release: "v2.1.1"
 
       # Set up BuildKit Docker container builder to be able to build
       # multi-platform images and export cache
@@ -88,6 +86,7 @@ jobs:
           cache-from: type=gha
           cache-to: type=gha,mode=max
           platforms: linux/arm64/v8,linux/amd64
+          secret-envs: VITE_URL=${{ secrets.URL }}
 
       # Sign the resulting Docker image digest except on PRs.
       # This will only write to the public Rekor transparency log when the Docker
