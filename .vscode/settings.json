@@ -4,6 +4,7 @@
   },
   "editor.formatOnSave": true,
   "[javascript]": {
-    "editor.defaultFormatter": "dbaeumer.vscode-eslint"
+    "editor.defaultFormatter": "vscode.typescript-language-features"
   },
+  "remote.autoForwardPortsFallback": 0,
 }
