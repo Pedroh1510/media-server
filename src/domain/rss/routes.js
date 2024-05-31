@@ -14,6 +14,8 @@ rssRouter.get(
     return res.send(data).end()
   }
   /* #swagger.tags = ["RSS"] 
+#swagger.path = '/rss'
+
 #swagger.parameters['term'] = {
   in: 'query',
   type: 'string'
@@ -35,7 +37,9 @@ rssRouter.get(
     const data = await service.listAll()
     return res.send(data).end()
   }
-  /* #swagger.tags = ["RSS"] */
+  /* #swagger.tags = ["RSS"]
+#swagger.path = '/rss/all'
+ */
 )
 
 rssRouter.get(
@@ -44,7 +48,9 @@ rssRouter.get(
     const data = await service.count()
     return res.send(data).end()
   }
-  /* #swagger.tags = ["RSS"] */
+  /* #swagger.tags = ["RSS"] 
+#swagger.path = '/rss/amount'
+*/
 )
 
 export default rssRouter

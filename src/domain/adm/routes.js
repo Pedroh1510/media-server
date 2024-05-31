@@ -20,7 +20,9 @@ admRouter.get(
     await admService.deleteRss()
     res.send()
   }
-  /* #swagger.tags = ["ADM"] */
+  /* #swagger.tags = ["ADM"]
+  #swagger.path = '/adm/export-data'
+   */
 )
 
 admRouter.get(
@@ -31,7 +33,9 @@ admRouter.get(
     res.attachment(fileName)
     stream.pipe(res)
   }
-  /* #swagger.tags = ["ADM"] */
+  /* #swagger.tags = ["ADM"] 
+  #swagger.path = '/adm/export-data'
+  */
 )
 
 admRouter.post(
@@ -41,7 +45,9 @@ admRouter.post(
     const data = await admService.importData({ fileStream: req })
     res.send(data)
   }
-  /* #swagger.tags = ["ADM"] */
+  /* #swagger.tags = ["ADM"] 
+  #swagger.path = '/adm/import-data'
+  */
 )
 
 const asyncWrapper = (fn) => (req, res, next) => Promise.resolve(fn(req, res, next)).catch((err) => next(err))
@@ -52,7 +58,7 @@ admRouter.post(
     res.status(201).end()
   })
   /* #swagger.tags = ["ADM"]
-  #swagger.path = '/tags'
+  #swagger.path = '/adm/tags'
   #swagger.parameters['tags'] = {
     in: 'body',
     required: true,

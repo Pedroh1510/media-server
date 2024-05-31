@@ -33,11 +33,11 @@ server.use(express.static('dist'))
 server.use('/docs', SwaggerDoc.middleware(), SwaggerDoc.doc())
 server.use('/mangas', mangasRouter)
 
-server.use(rssRouter)
+server.use('/rss', rssRouter)
 
-server.use(extractorRouter)
+server.use('/extractor', extractorRouter)
 
-server.use(admRouter)
+server.use('/adm', admRouter)
 server.use('/api', queueRoute)
 server.get('/api', (_, res) => res.send('OK'))
 
