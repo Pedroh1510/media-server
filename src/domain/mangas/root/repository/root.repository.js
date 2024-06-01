@@ -48,6 +48,7 @@ export default class RootRepository {
             name: true,
             error: true,
             read: true,
+            filePath: true,
           },
           orderBy: {
             name: 'asc',

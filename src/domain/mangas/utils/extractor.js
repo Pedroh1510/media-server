@@ -14,7 +14,7 @@ export default class Extractor {
    * @param {Image[]} images
    */
   async download(images, headers = {}) {
-
+    await setTimeout(100)
     await Promise.all(
       images.map((image) => {
         const process = async () => {
@@ -22,7 +22,12 @@ export default class Extractor {
         }
         return process()
       })
-    )
+    ).catch((e) => {
+      if (e?.errors && e.errors.length) {
+        throw e.errors[0]
+      }
+      throw e
+    })
     const zip = new AdmZip()
     for (const image of images) {
       zip.addFile(image.name, image.buffer)

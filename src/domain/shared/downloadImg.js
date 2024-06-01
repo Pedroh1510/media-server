@@ -11,6 +11,15 @@ export default class DownloadImageService {
   }
 
   async getBuffer(url, headers = {}) {
-    return axios.get(url, { headers, responseType: 'arraybuffer' }).then((response) => response.data)
+    const { origin } = new URL(url)
+    return axios
+      .get(url, {
+        headers: {
+          Referer: origin,
+          ...headers,
+        },
+        responseType: 'arraybuffer',
+      })
+      .then((response) => response.data)
   }
 }

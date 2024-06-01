@@ -13,7 +13,7 @@ async function imagesApi(mangaId, chapterId) {
   return axios.get(`${url}/mangas/${mangaId}/${chapterId}/images`).then((res) => res?.data)
 }
 /**
- * @typedef {{name:String,id:String,read:Boolean,error:Boolean}} Chapter
+ * @typedef {{name:String,id:String,read:Boolean,error:Boolean, color:String,enable:Boolean}} Chapter
  * @typedef {{name:String,id:String, Chapters:Chapter[]}} Manga
  * @returns {Promise<Manga[]>}
  */
@@ -24,6 +24,7 @@ async function mangasApi() {
     Chapters: manga.Chapters.map((item) => ({
       ...item,
       color: item.read ? 'greenyellow' : item.error ? 'red' : 'white',
+      enable: item.downloaded,
     })),
   }))
 }

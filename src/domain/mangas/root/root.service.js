@@ -32,7 +32,10 @@ export default class RootService {
   }
 
   async list() {
-    return this.repository.list()
+    return (await this.repository.list()).map((manga) => ({
+      ...manga,
+      Chapters: manga.Chapters.map((chapter) => ({ ...chapter, downloaded: !!chapter.filePath, filePath: undefined })),
+    }))
   }
 
   async updateChapter(id, read, error) {

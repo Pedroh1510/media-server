@@ -30,6 +30,7 @@ export default function Selector({ items = [], value, onChange, text, disable })
                 sx={{
                   backgroundColor: manga.color ?? 'white',
                 }}
+                disabled={manga.enable !== undefined ? !manga.enable : false}
               >
                 {manga.name}
               </MenuItem>
