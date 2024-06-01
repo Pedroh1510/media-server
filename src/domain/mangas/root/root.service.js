@@ -123,9 +123,13 @@ export default class RootService {
     chapterId = parseInt(chapterId)
 
     const { type, name: mangaName } = await this.repository.getManga(mangaId)
-    const { images, name } = await this.repository.getChapter(mangaId, undefined, chapterId)
+    const { images, name, filePath } = await this.repository.getChapter(mangaId, undefined, chapterId)
     const site = sites[type]
     logger.info(`Download ${mangaId} images by ep: ${name}`)
+    if (filePath) {
+      logger.info(`Download Exist ${mangaId} images by ep: ${name}`)
+      return
+    }
     const start = new Date().getTime()
     const headers = site.browserContent?.headers ?? {}
     const zip = await this.extractor.download(
@@ -134,14 +138,17 @@ export default class RootService {
         .map((image, index) => ({ link: image, name: `${index}.${image.split('.').pop()}` })),
       headers
     )
-    const path = `./downloads/${mangaName}`
+    const cleanFileName = (name) => name.replace(/\W/, '_')
+    const path = `./downloads/${cleanFileName(mangaName)}`
     await mkdir(path, { recursive: true })
-    await writeFile(`${path}/${name}.zip`, zip)
+    const pathFile = `${path}/${cleanFileName(name)}.zip`
+    await writeFile(pathFile, zip)
     const totalTime = (new Date().getTime() - start) / 1000
     const minTime = 2000
     if (totalTime < minTime) {
       await setTimeout(Math.abs(totalTime - minTime))
     }
+    await this.repository.updateChapterFile(pathFile)
     logger.info(`Downloaded ${mangaId} images by ep: ${name}`)
   }
 
@@ -161,6 +168,7 @@ export default class RootService {
 
     await this.addQueueImage(mangaId, chapterId)
   }
+
   async addQueueManga(mangaId) {
     await mangaQueue.add(
       { mangaId },

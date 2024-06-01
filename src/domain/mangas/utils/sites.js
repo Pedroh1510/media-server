@@ -131,6 +131,11 @@ export const sites = {
       epName: '#_listUl > li > a > span.subj > span',
       image: '#_imageList > img',
     },
+    browserContent: {
+      headers: {
+        Referer: 'https://www.webtoons.com',
+      },
+    },
   },
   slimeread: {
     url: 'https://slimeread.com/',

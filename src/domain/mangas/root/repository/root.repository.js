@@ -35,8 +35,8 @@ export default class RootRepository {
   async list(type) {
     const filter = {
       type: {
-        in: type
-      }
+        in: type,
+      },
     }
     const where = type ? filter : undefined
     return this.#prisma.mangas.findMany({
@@ -55,9 +55,9 @@ export default class RootRepository {
         },
       },
       orderBy: {
-        name: "asc"
+        name: 'asc',
       },
-      where
+      where,
     })
   }
 
@@ -104,6 +104,17 @@ export default class RootRepository {
       data: {
         error,
         read,
+      },
+      where: {
+        id,
+      },
+    })
+  }
+
+  async updateChapterFile(id, filePath) {
+    await this.#prisma.chapters.update({
+      data: {
+        filePath,
       },
       where: {
         id,
