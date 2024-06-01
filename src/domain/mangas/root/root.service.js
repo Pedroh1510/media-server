@@ -171,8 +171,9 @@ export default class RootService {
     await mangaQueue.add(
       { mangaId },
       {
-        removeOnComplete: true,
+        removeOnComplete: { age: 3600 },
         delay: 200,
+        attempts: 3,
       }
     )
   }
@@ -181,8 +182,9 @@ export default class RootService {
     await mangaQueue.add(
       { mangaId, chapterId },
       {
-        removeOnComplete: true,
+        removeOnComplete: { age: 3600 },
         delay: 200,
+        attempts: 3,
       }
     )
   }
