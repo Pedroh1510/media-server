@@ -4,6 +4,7 @@ import Selector from './components/selector'
 import { AppBar, Box, Checkbox, Fab, Toolbar } from '@mui/material'
 import ScrollTop from './components/scrollTop'
 import KeyboardArrowUpIcon from '@mui/icons-material/KeyboardArrowUp'
+// const url = 'http://localhost:3000'
 const url = window.location.origin
 /**
  * @returns {Promise<{data:Buffer, name:String}[]>}
@@ -12,12 +13,19 @@ async function imagesApi(mangaId, chapterId) {
   return axios.get(`${url}/mangas/${mangaId}/${chapterId}/images`).then((res) => res?.data)
 }
 /**
- * @typedef {{name:String,id:String}} Chapter
+ * @typedef {{name:String,id:String,read:Boolean,error:Boolean}} Chapter
  * @typedef {{name:String,id:String, Chapters:Chapter[]}} Manga
  * @returns {Promise<Manga[]>}
  */
 async function mangasApi() {
-  return axios.get(`${url}/mangas`).then((res) => res.data)
+  const response = await axios.get(`${url}/mangas`).then((res) => res.data)
+  return response.map((manga) => ({
+    ...manga,
+    Chapters: manga.Chapters.map((item) => ({
+      ...item,
+      color: item.read ? 'greenyellow' : item.error ? 'red' : 'white',
+    })),
+  }))
 }
 
 async function updateChapter({ chapterId, read, error }) {
@@ -61,7 +69,10 @@ function App(props) {
     if (view.manga) {
       const manga = mangas.find((manga) => view.manga.id === manga.id)
       if (!manga) return
-      setView({ ...view, chapters: manga.Chapters })
+      setView({
+        ...view,
+        chapters: manga.Chapters,
+      })
     }
   }
 
@@ -78,7 +89,12 @@ function App(props) {
       clear()
     }
     setMangaSelected(event.target.value)
-    setView({ ...view, manga: manga, chapters: manga.Chapters ?? [], chapter })
+    setView({
+      ...view,
+      manga: manga,
+      chapters: manga.Chapters ?? [],
+      chapter,
+    })
   }
   const handleChangeChapter = async (event) => {
     clear()

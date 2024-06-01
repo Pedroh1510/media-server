@@ -24,7 +24,13 @@ export default function Selector({ items = [], value, onChange, text, disable })
             onChange={onChange}
           >
             {items.map((manga) => (
-              <MenuItem key={manga.name} value={manga.id}>
+              <MenuItem
+                key={manga.name}
+                value={manga.id}
+                sx={{
+                  backgroundColor: manga.color ?? 'white',
+                }}
+              >
                 {manga.name}
               </MenuItem>
             ))}
