@@ -42,6 +42,7 @@ model Chapters {
   read     Boolean  @default(false)
   createAt DateTime @default(now())
   error    Boolean  @default(false)
+  filePath String?
 
   @@unique([name, mangaId])
 }
