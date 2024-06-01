@@ -46,12 +46,10 @@ export default class RootService {
   async getChapterImages(mangaId, chapterId) {
     mangaId = parseInt(mangaId)
     chapterId = parseInt(chapterId)
-    const manga = await this.repository.getManga(mangaId)
     const chapter = await this.repository.getChapter(mangaId, undefined, chapterId)
-    const path = `./downloads/${manga.name}/${chapter.name}.zip`
     try {
-      await stat(path)
-      const zip = new AdmZip(path)
+      await stat(chapter.filePath)
+      const zip = new AdmZip(chapter.filePath)
       const images = []
       for (const entry of zip.getEntries()) {
         images.push({
