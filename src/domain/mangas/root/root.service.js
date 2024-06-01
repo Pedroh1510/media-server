@@ -148,7 +148,7 @@ export default class RootService {
     if (totalTime < minTime) {
       await setTimeout(Math.abs(totalTime - minTime))
     }
-    await this.repository.updateChapterFile(pathFile)
+    await this.repository.updateChapterFile(chapterId, pathFile)
     logger.info(`Downloaded ${mangaId} images by ep: ${name}`)
   }
 
