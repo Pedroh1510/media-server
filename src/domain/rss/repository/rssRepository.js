@@ -23,6 +23,7 @@ export default class RssRepository {
 
   async listAll() {
     return this.#prisma.torrent.findMany({
+      take: 100,
       orderBy: {
         pubDate: 'desc',
       },

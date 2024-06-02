@@ -2,8 +2,8 @@ import AdmZip from 'adm-zip'
 import { mkdir, writeFile, stat } from 'node:fs/promises'
 import { setTimeout } from 'node:timers/promises'
 
+import { mangaQueue } from '../../../job.js'
 import logger from '../../../utils/logger.js'
-import { mangaQueue } from '../queues/queues.js'
 import Extractor from '../utils/extractor.js'
 import { sites } from '../utils/sites.js'
 import RootRepository from './repository/root.repository.js'
@@ -139,7 +139,7 @@ export default class RootService {
         .map((image, index) => ({ link: image, name: `${index}.${image.split('.').pop()}` })),
       headers
     )
-    const cleanFileName = (name) => name.replace(/\W/, '_')
+    const cleanFileName = (name) => name.replace(/\W/g, '_').replace(/\//g, '')
     const path = `./downloads/${cleanFileName(mangaName)}`
     await mkdir(path, { recursive: true })
     const pathFile = `${path}/${cleanFileName(name)}.zip`
