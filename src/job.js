@@ -1,40 +1,54 @@
 /* eslint-disable no-new */
-import { CronJob } from 'cron'
+import { createBullBoard } from '@bull-board/api'
+import { BullAdapter } from '@bull-board/api/bullAdapter.js'
+import { ExpressAdapter } from '@bull-board/express'
+import Queue from 'bull'
 
 import AdmService from './domain/adm/admService.js'
 import ExtractorService from './domain/extractor/extractorService.js'
+import MangaRootService from './domain/mangas/root/root.service.js'
+import CONFIG from './infra/config.js'
 import logger from './utils/logger.js'
 
 const admService = new AdmService()
 const extractorService = new ExtractorService()
 
-/**
- *
- */
-export default function jobs() {
-  logger.info('start jobs')
-  new CronJob(
-    '30 * * * *', // cronTime
-    async function () {
-      logger.info('startCron')
-      await extractorService.scan({ total: 5 }).catch(() => {})
-      logger.info('endCron')
-    }, // onTick
-    null, // onComplete
-    true, // start
-    'America/Los_Angeles' // timeZone
-  )
-  new CronJob(
-    '0/10 * * * *', // cronTime
-    async function () {
-      logger.info('startCron')
-      try {
-        await admService.deleteFiles()
-      } catch {}
-      logger.info('endCron')
-    }, // onTick
-    null, // onComplete
-    true, // start
-    'America/Los_Angeles' // timeZone
-  )
+export const mangaQueue = new Queue('Manga process', `redis://${CONFIG.redis}`)
+export const animeQueue = new Queue('Anime process', `redis://${CONFIG.redis}`)
+export const admAnimeQueue = new Queue('Adm Anime', `redis://${CONFIG.redis}`)
+
+export default class QueueService {
+  mangaRoot = new MangaRootService()
+  execute() {
+    mangaQueue.process((job) => this.mangaRoot.queueManga(job.data))
+    animeQueue.process((_job) => {
+      const process = async () => {
+        logger.info('startCron')
+        await extractorService.scan({ total: 5 }).catch(() => ({}))
+        logger.info('endCron')
+      }
+      return process()
+    })
+    admAnimeQueue.process(() => {
+      const process = async () => {
+        logger.info('startCron')
+        await admService.deleteFiles().catch(() => ({}))
+        logger.info('endCron')
+      }
+      return process()
+    })
+
+    animeQueue.add('', { repeat: { cron: '30 * * * *' }, removeOnComplete: true, removeOnFail: { age: 1800 } })
+    admAnimeQueue.add('', { repeat: { cron: '1 * * * *' }, removeOnComplete: true, removeOnFail: { age: 60 } })
+  }
 }
+
+const serverAdapter = new ExpressAdapter()
+createBullBoard({
+  queues: [new BullAdapter(mangaQueue), new BullAdapter(animeQueue), new BullAdapter(admAnimeQueue)],
+  serverAdapter,
+})
+
+serverAdapter.setBasePath('/queues')
+
+export const queueRoute = serverAdapter.getRouter()
