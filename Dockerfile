@@ -8,7 +8,8 @@ WORKDIR /app
 # RUN apk upgrade --update-cache --available && \
 #   apk add openssl && \
 #   rm -rf /var/cache/apk/*
-# RUN apt update -y && apt install openssl
+RUN apt update && apt upgrade -y && apt install openssl -y
+RUN npm install -g npm
 COPY package* .
 
 RUN npm ci
