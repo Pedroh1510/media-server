@@ -95,7 +95,7 @@ export default class RootService {
   async processAllMangas() {
     const mangas = await this.repository.list()
     for (const manga of mangas) {
-      await this.addQueueImage(manga.id)
+      await this.addQueueManga(manga.id)
     }
   }
 
