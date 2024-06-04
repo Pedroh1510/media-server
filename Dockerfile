@@ -5,9 +5,10 @@ RUN npm run build
 
 FROM node:20-slim as runner
 WORKDIR /app
-RUN apk upgrade --update-cache --available && \
-  apk add openssl && \
-  rm -rf /var/cache/apk/*
+# RUN apk upgrade --update-cache --available && \
+#   apk add openssl && \
+#   rm -rf /var/cache/apk/*
+RUN apt upgrade -y && apt install openssl
 COPY package* .
 
 RUN npm ci
@@ -16,7 +17,7 @@ RUN npx prisma generate
 COPY . .
 
 COPY --from=builder dist /app/dist
-RUN npx @puppeteer/browsers install chromium@latest
+# RUN npx @puppeteer/browsers install chromium@latest
 
 ENV port=3333
 EXPOSE 3333
