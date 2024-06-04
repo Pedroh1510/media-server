@@ -38,6 +38,11 @@ export default class QueueService {
       return process()
     })
 
+    mangaQueue.add(
+      { all: true },
+      { repeat: { cron: '0 21 * * *' }, removeOnComplete: true, removeOnFail: { age: 1800 } }
+    )
+
     animeQueue.add('', { repeat: { cron: '30 * * * *' }, removeOnComplete: true, removeOnFail: { age: 1800 } })
     admAnimeQueue.add('', { repeat: { cron: '1 * * * *' }, removeOnComplete: true, removeOnFail: { age: 60 } })
   }

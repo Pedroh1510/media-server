@@ -80,13 +80,23 @@ export default class RootService {
     }
   }
 
-  async queueManga({ mangaId, chapterId }) {
+  async queueManga({ mangaId, chapterId, all = false }) {
+    if (all) {
+      return this.processAllMangas()
+    }
     if (chapterId) {
       await this.downloadMangaEps({ mangaId, chapterId })
       return
     }
     await this.processManga(mangaId)
     await this.processMangaEps(mangaId)
+  }
+
+  async processAllMangas() {
+    const mangas = await this.repository.list()
+    for (const manga of mangas) {
+      await this.addQueueImage(manga.id)
+    }
   }
 
   async processManga(mangaId) {
