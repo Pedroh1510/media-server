@@ -47,5 +47,5 @@ COPY --from=builder dist /app/dist
 ENV port=3333
 EXPOSE 3333
 
-CMD [ "node","ppp.js" ]
-# CMD [ "npm","run","start" ]
+# CMD [ "node","ppp.js" ]
+CMD [ "npm","run","start" ]
