@@ -13,12 +13,12 @@ RUN npm install -g npm
 COPY package* .
 
 RUN npm ci
+RUN npx puppeteer browsers install chrome
 COPY prisma ./prisma/
 RUN npx prisma generate
 COPY . .
 
 COPY --from=builder dist /app/dist
-# RUN npx @puppeteer/browsers install chromium@latest
 
 ENV port=3333
 EXPOSE 3333
