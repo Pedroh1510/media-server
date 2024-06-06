@@ -10,10 +10,11 @@ WORKDIR /app
 # RUN apk upgrade --update-cache --available && \
 #   apk add openssl && \
 #   rm -rf /var/cache/apk/*
+# RUN apk update && apk add --no-cache nmap openssl
 RUN apk update && apk add --no-cache nmap openssl && \
-  echo @edge https://dl-cdn.alpinelinux.org/alpine/edge/community >> /etc/apk/repositories && \
-  echo @edge https://dl-cdn.alpinelinux.org/alpine/edge/main >> /etc/apk/repositories && \
-  apk update && \
+  #   echo @edge https://dl-cdn.alpinelinux.org/alpine/edge/community >> /etc/apk/repositories && \
+  #   echo @edge https://dl-cdn.alpinelinux.org/alpine/edge/main >> /etc/apk/repositories && \
+  #   apk update && \
   apk add --no-cache \
   chromium \
   harfbuzz \
@@ -36,7 +37,7 @@ RUN npm install -g npm
 COPY package* .
 
 RUN npm ci --silent
-RUN npx puppeteer browsers install chrome
+# RUN npx puppeteer browsers install chrome
 COPY prisma ./prisma/
 RUN npx prisma generate
 COPY . .
@@ -46,4 +47,5 @@ COPY --from=builder dist /app/dist
 ENV port=3333
 EXPOSE 3333
 
-CMD [ "npm","run","start" ]
+CMD [ "node","ppp.js" ]
+# CMD [ "npm","run","start" ]
