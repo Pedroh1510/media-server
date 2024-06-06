@@ -41,16 +41,17 @@ export default class Browser {
     if (accessUrl) {
       // await this.page.setUserAgent('Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/125.0.0.0 Safari/537.36')
       if (!Utils.isEmpty(this.headersLocal)) {
-        await this.page.setRequestInterception(true)
-        this.page.on('request', async (request) => {
-          const a = request.headers()
-          for (const key in this.headersLocal) {
-            a[key] = this.headersLocal[key]
-          }
-          request.continue({
-            headers: a,
-          })
-        })
+        await this.page.setExtraHTTPHeaders(this.headersLocal)
+        // await this.page.setRequestInterception(true)
+        // this.page.on('request', async (request) => {
+        //   const a = request.headers()
+        //   for (const key in this.headersLocal) {
+        //     a[key] = this.headersLocal[key]
+        //   }
+        //   request.continue({
+        //     headers: a,
+        //   })
+        // })
       }
       await this.page.goto(url)
     }
