@@ -1,117 +1,38 @@
-version: '2.1'
 services:
-  sonarr:
-    image: linuxserver/sonarr
-    container_name: sonarr
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
-      - UMASK_SET=022 #optional
-    volumes:
-      - ${SSD}/sonarr:/config
-      - ${DATA}/tvseries:/tv
-      - ${DATA}/downloads:/downloads
-    ports:
-      - 8989:8989
-    restart: unless-stopped
-    deploy:
-      resources:
-        limits:
-          cpus: '0.30'
-
-  radarr:
-    image: linuxserver/radarr
-    container_name: radarr
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
-      - UMASK_SET=022 #optional
-    volumes:
-      - ${SSD}/radarr:/config
-      - ${DATA}/movies:/movies
-      - ${DATA}/downloads:/downloads
-    ports:
-      - 7878:7878
-    deploy:
-      resources:
-        limits:
-          cpus: '0.30'
-
-  qbittorrent:
-    image: lscr.io/linuxserver/qbittorrent:latest
-    container_name: qbittorrent
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
-      - WEBUI_PORT=8080
-    volumes:
-      - ${SSD}/qbittorrent:/config
-      - ${DATA}/downloads:/downloads
-    ports:
-      - 8080:8080
-      - 6881:6881
-      - 6881:6881/udp
-    restart: unless-stopped
-    deploy:
-      resources:
-        limits:
-          cpus: '0.30'
-
-  jellyfin:
-    image: lscr.io/linuxserver/jellyfin:latest
-    container_name: jellyfin
-    environment:
-      - PUID=${PUID}
-      - PGID=${PGID}
-      - TZ=${TZ}
-    volumes:
-      - ${SSD}/jellyfin:/config
-      - ${DATA}/movies:/data/movies
-      - ${DATA}/tvseries:/data/tvshows:ro
-    ports:
-      - 8096:8096
-    restart: unless-stopped
-
   rss:
-    # image: pedroh1510/rss:latest
+    image: pedroh1510/rss:latest
     build: .
     container_name: rss
+    # network_mode: 'service:vpn'
     ports:
       - 4000:4000
     environment:
       - port=4000
-      - host=localhost
+      - host=rss.${DOMAIN}
       - TZ=${TZ}
-    env_file:
-      - .env
+      - DATABASE_URL=postgresql://${DB_USER}:${DB_PASS}@${DB_HOST}:5432/${DB_SCHEMA}
+      - user_torrent=${TORRENT_USER}
+      - pass_torrent=${TORRENT_PASS}
     volumes:
-      - ${DATA}/rss:/app/prisma/
-      - ${DATA}/downloads:/app/downloads
+      - ${DATA}/rss/db:/app/prisma/
+      - ${DATA}/rss/downloads:/app/downloads
     restart: unless-stopped
+    depends_on:
+      - database
+      - vpn
     deploy:
       resources:
         limits:
-          cpus: '0.50'
+          cpus: '1'
+    networks:
+      - proxy
+    labels:
+      - traefik.enable=true
+      - traefik.http.routers.rss-router.rule=Host(`rss.${DOMAIN}`)
+      - traefik.http.routers.rss-router.entrypoints=websecure
+      - traefik.http.routers.rss-router.tls=true
+      - traefik.http.services.rss-router.loadbalancer.server.port=4000
 
-  database:
-    image: 'postgres:latest'
-    container_name: database
-    # ports:
-    #   - 5432:5432
-    env_file:
-      - .env
-    volumes:
-      - ${DATA}/database:/var/lib/postgresql/data/
-
-  # database_adm:
-  #   image: dpage/pgadmin4
-  #   container_name: database_adm
-  #   ports:
-  #     - 8085:80
-  #   env_file:
-  #     - .env
-  #   depends_on:
-  #     - database
+networks:
+  proxy:
+    external: true
