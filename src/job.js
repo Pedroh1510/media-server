@@ -13,6 +13,7 @@ import logger from './utils/logger.js'
 const admService = new AdmService()
 const extractorService = new ExtractorService()
 
+console.log(CONFIG.redis)
 export const mangaQueue = new Queue('Manga process', CONFIG.redis)
 export const animeQueue = new Queue('Anime process', CONFIG.redis)
 export const admAnimeQueue = new Queue('Adm Anime', CONFIG.redis)
