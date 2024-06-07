@@ -94,7 +94,7 @@ export default class RootService {
 
   async processAllMangas() {
     const mangas = await this.repository.list()
-    for (const manga of mangas) {
+    for (const manga of mangas.sort((p, c) => p.type.localeCompare(c.type))) {
       await this.addQueueManga(manga.id)
     }
   }
