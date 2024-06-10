@@ -199,7 +199,7 @@ export default class Extractor {
           return listMangas.concat(await getUrls(`${baseUrl}${nextUrl}`))
         } catch (error) {
           await setTimeout(1000)
-          logger.warn(`retry ${index}`)
+          logger.warn(`retry ${index}\n ${error}`)
         }
       }
       return listMangas
@@ -261,7 +261,7 @@ export default class Extractor {
           selectors.numberPageEp = a?.numberPage
           break
         } catch (error) {
-          logger.warn(`retry ${index}`)
+          logger.warn(`retry ${index} \n ${error}`)
         }
       }
     } while (url)
@@ -294,7 +294,7 @@ export default class Extractor {
         }
         break
       } catch (error) {
-        logger.warn(`retry ${index}`)
+        logger.warn(`retry ${index} \n${error}`)
       }
     }
     await browser.close()

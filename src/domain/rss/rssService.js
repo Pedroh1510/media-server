@@ -33,7 +33,7 @@ export default class RssService {
 
     const response = await this.repository.list({
       term,
-      limit: term ? undefined : 10000,
+      limit: term ? undefined : 100,
     })
 
     const items = []
