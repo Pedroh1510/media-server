@@ -20,7 +20,7 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '1'
+          cpus: '0.5'
     networks:
       - proxy
     labels:
