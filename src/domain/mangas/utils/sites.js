@@ -89,7 +89,8 @@ export const sites = {
     url: 'https://sinensistoon.com/todas-as-obras/',
     selectors: {
       content: 'body > main > section > div > a.titulo__comic__allcomics',
-      ep: "body > main > section.capitulos__obra > ul > a', 'body > main > section.capitulos__obra > ul > a > li > div > span",
+      ep: 'body > main > section.capitulos__obra > ul > a',
+      epName: 'body > main > section.capitulos__obra > ul > a > li> div>span:nth-child(1)',
       image: '#imageContainer > img',
     },
   },
