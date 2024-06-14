@@ -25,11 +25,20 @@ model VerifyTags {
 }
 
 model Mangas {
-  id       Int        @id @default(autoincrement())
-  name     String     @unique
-  link     String
-  type     String
-  Chapters Chapters[]
+  id          Int        @id @default(autoincrement())
+  name        String     @unique
+  link        String
+  type        String
+  Chapters    Chapters[]
+  idSiteManga Int?
+  siteManga   SiteManga? @relation(fields: [idSiteManga], references: [id])
+}
+
+model SiteManga {
+  id           Int      @id @default(autoincrement())
+  name         String   @unique
+  autoDownload Boolean  @default(false)
+  Mangas       Mangas[]
 }
 
 model Chapters {
