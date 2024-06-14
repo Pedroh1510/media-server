@@ -1,6 +1,7 @@
 import logger from '../../utils/logger.js'
 import TorrentService from '../shared/torrentService.js'
 import AnimeToshoService from './animeToshoService.js'
+import EraiService from './eraiService.js'
 import ExtractorRepository from './extractorRepository.js'
 import MoeService from './moeService.js'
 import NyaaService from './nyaaService.js'
@@ -11,6 +12,7 @@ export default class ExtractorService {
     this.moeService = new MoeService()
     this.nyaaService = new NyaaService()
     this.animeToshoService = new AnimeToshoService()
+    this.eraiService = new EraiService()
     this.torrentService = new TorrentService()
   }
 
@@ -24,7 +26,7 @@ export default class ExtractorService {
         await this.torrentService.magnetInfo(item.link)
         await this.repository.save(item)
         counter++
-      } catch (error) {}
+      } catch (error) { }
     }
     return counter
   }
@@ -42,6 +44,7 @@ export default class ExtractorService {
       this.#executeExtractor(() => this.moeService.extractor(total)),
       this.#executeExtractor(() => this.nyaaService.extractor(undefined, true)),
       this.#executeExtractor(() => this.animeToshoService.extractor()),
+      this.#executeExtractor(() => this.eraiService.extractor()),
     ])
 
     logger.info(`scan -> end ${responses.reduce((p, c) => p + c, 0)}`)
@@ -55,6 +58,7 @@ export default class ExtractorService {
       this.#executeExtractor(() => this.moeService.extractorAll()),
       this.#executeExtractor(() => this.nyaaService.extractor(undefined, true)),
       this.#executeExtractor(() => this.animeToshoService.extractor()),
+      this.#executeExtractor(() => this.eraiService.extractor()),
     ])
 
     const total = responses.reduce((p, c) => p + c, 0)
