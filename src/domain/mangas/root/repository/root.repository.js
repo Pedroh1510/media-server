@@ -62,6 +62,34 @@ export default class RootRepository {
     })
   }
 
+  async listDownloadEnable() {
+    return this.#prisma.mangas.findMany({
+      include: {
+        _count: true,
+        Chapters: {
+          select: {
+            id: true,
+            name: true,
+            error: true,
+            read: true,
+            filePath: true,
+          },
+          orderBy: {
+            name: 'asc',
+          },
+        },
+      },
+      orderBy: {
+        name: 'asc',
+      },
+      where: {
+        siteManga: {
+          autoDownload: true,
+        },
+      },
+    })
+  }
+
   async listChapterByNameAndManga(names, mangaId) {
     return this.#prisma.chapters.findMany({
       where: {
