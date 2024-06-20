@@ -39,5 +39,5 @@ const logger = winston.createLogger({
   exceptionHandlers: [makeTransportLoki()],
   rejectionHandlers: [makeTransportLoki()],
 })
-
+logger.info(JSON.stringify(CONFIG, null, 2))
 export default logger
