@@ -37,8 +37,6 @@ services:
     build: .
     container_name: rss-jobs
     command: npm run job
-    ports:
-      - 4000:4000
     environment:
       - port=4000
       - host=rss.${DOMAIN}
