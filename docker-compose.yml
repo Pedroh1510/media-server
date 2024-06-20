@@ -12,7 +12,9 @@ services:
       - DATABASE_URL=postgresql://${DB_USER}:${DB_PASS}@${DB_HOST}:5432/${DB_SCHEMA}
       - user_torrent=${TORRENT_USER}
       - pass_torrent=${TORRENT_PASS}
-      - REDIS=${REDIS}
+      - REDIS_HOST=${REDIS_HOST}
+      - REDIS_PORT=${REDIS_PORT}
+      - ERAI=${ERAI}
     volumes:
       - ${DATA}/rss/db:/app/prisma/
       - ${DATA}/rss/downloads:/app/downloads
