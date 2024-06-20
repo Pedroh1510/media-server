@@ -6,7 +6,6 @@ import { setTimeout } from 'node:timers/promises'
 import logger from '../../../utils/logger.js'
 import DownloadImageService from '../../shared/downloadImg.js'
 import Browser from './browser.js'
-import { writeFile } from 'node:fs/promises'
 
 export default class Extractor {
   downloadService = new DownloadImageService()
@@ -81,13 +80,14 @@ export default class Extractor {
 
   getPage(text) {
     if (!text) return {}
-    let numeros = text.match(/\d+/g);
+    const numeros = text.match(/\d+/g)
 
     if (numeros !== null && numeros.length >= 2) {
       return { current: parseInt(numeros[0]), total: parseInt(numeros[1]) }
     }
     return {}
   }
+
   async getAllMangasApi({
     url = '',
     baseUrl = '',
@@ -167,8 +167,9 @@ export default class Extractor {
         const listContentNew = html(selectors.content)
         counter++
         if (listContentNew.length - listContentOld.length > 0) {
-          logger.info(`Page: ${counter} - ${listContentNew.length - listContentOld.length} - ${listContentNew.length} - ${url}`)
-
+          logger.info(
+            `Page: ${counter} - ${listContentNew.length - listContentOld.length} - ${listContentNew.length} - ${url}`
+          )
         }
       } else {
         divNextPage = []
@@ -177,8 +178,8 @@ export default class Extractor {
   }
 
   /**
-   * @param {Object} param 
-   * @param {Browser} param.browser 
+   * @param {Object} param
+   * @param {Browser} param.browser
    * @param {String} param.url
    * @param {String} param.baseUrl
    * @param {Object} param.selectors
@@ -205,7 +206,7 @@ export default class Extractor {
           await this.clickMore({ browser, selectors, url })
           break
         } catch (error) {
-          console.log(error);
+          logger.error(error)
         }
       }
       content = await browser.getContent(url, false)
@@ -247,7 +248,7 @@ export default class Extractor {
   /**
    * @returns {AsyncGenerator<{link:String,name:String}[]}
    */
-  async * getAllMangas({
+  async *getAllMangas({
     url = '',
     baseUrl = '',
     api,
@@ -275,10 +276,14 @@ export default class Extractor {
     try {
       const maxRetry = 3
       do {
-        let counter = 0
+        const counter = 0
         for (let index = 1; index <= maxRetry; index++) {
           try {
-            const { listMangas, nextUrl, numberPage: np } = await this.getMangasInPage({ browser, url, numberPage, selectors, baseUrl })
+            const {
+              listMangas,
+              nextUrl,
+              numberPage: np,
+            } = await this.getMangasInPage({ browser, url, numberPage, selectors, baseUrl })
             url = nextUrl
             numberPage = np
             yield listMangas

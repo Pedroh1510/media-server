@@ -7,6 +7,8 @@ const CONFIG = {
   userTorrent: process.env.user_torrent,
   passTorrent: process.env.pass_torrent,
   loki: process.env.loki || '',
-  redis: process.env.REDIS || '127.0.0.1:6379',
+  redis_host: process.env.REDIS_HOST || '127.0.0.1',
+  redis_port: process.env.REDIS_PORT || '6379',
+  erai: process.env.ERAI,
 }
 export default CONFIG

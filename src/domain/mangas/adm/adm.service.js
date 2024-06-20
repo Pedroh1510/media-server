@@ -3,8 +3,6 @@ import logger from '../../../utils/logger.js'
 import Extractor from '../utils/extractor.js'
 import { sites } from '../utils/sites.js'
 import AdmRepository from './repository/adm.repository.js'
-import { Worker } from 'node:worker_threads'
-import workerpool from 'workerpool'
 
 export default class AdmService {
   repository = new AdmRepository()
@@ -32,6 +30,7 @@ export default class AdmService {
   getTypes() {
     return Object.keys(sites)
   }
+
   async processItemCatalog(idSite) {
     const site = await this.repository.get(idSite)
     logger.info(`Processing ${site.name}`)

@@ -1,4 +1,5 @@
-import ExtractorService from "../domain/extractor/extractorService.js"
+import ExtractorService from '../domain/extractor/extractorService.js'
+import logger from '../utils/logger.js'
 
 export default async function animeQueueJob() {
   const extractorService = new ExtractorService()

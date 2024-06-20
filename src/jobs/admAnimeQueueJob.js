@@ -1,4 +1,5 @@
-import AdmService from "../domain/adm/admService.js"
+import AdmService from '../domain/adm/admService.js'
+import logger from '../utils/logger.js'
 
 export default async function animeQueueJob() {
   const admService = new AdmService()
