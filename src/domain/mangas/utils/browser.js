@@ -21,8 +21,8 @@ export default class Browser {
   async init() {
     puppeteer.use(StealthPlugin())
     const browser = await puppeteer.launch({
-      executablePath: '/usr/bin/chromium',
-      args: ['--no-sandbox', '--disable-dev-shm-usage'],
+      // executablePath: '/usr/bin/chromium',
+      // args: ['--no-sandbox', '--disable-dev-shm-usage'],
     })
     this.browser = browser
     await this.newPage()

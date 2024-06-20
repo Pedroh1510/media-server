@@ -18,6 +18,15 @@ admRouter.get('/', (_req, res) => {
   res.send(service.getTypes())
 })
 
+admRouter.post('/catalog', async (req, res) => {
+  await service.processCatalog(req.body)
+  res.send()
+})
+admRouter.get('/catalog', async (req, res) => {
+  const data = await service.searchInCatalog(req.query?.term)
+  res.send(data)
+})
+
 admRouter.get('/:type', (req, res) => {
   const headers = service.getHeaders({ type: req.params.type })
   res.send(headers)

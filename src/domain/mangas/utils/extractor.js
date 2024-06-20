@@ -6,6 +6,7 @@ import { setTimeout } from 'node:timers/promises'
 import logger from '../../../utils/logger.js'
 import DownloadImageService from '../../shared/downloadImg.js'
 import Browser from './browser.js'
+import { writeFile } from 'node:fs/promises'
 
 export default class Extractor {
   downloadService = new DownloadImageService()
@@ -78,6 +79,15 @@ export default class Extractor {
     }
   }
 
+  getPage(text) {
+    if (!text) return {}
+    let numeros = text.match(/\d+/g);
+
+    if (numeros !== null && numeros.length >= 2) {
+      return { current: parseInt(numeros[0]), total: parseInt(numeros[1]) }
+    }
+    return {}
+  }
   async getAllMangasApi({
     url = '',
     baseUrl = '',
@@ -138,7 +148,106 @@ export default class Extractor {
     return listMangas
   }
 
-  async getAllMangas({
+  async clickMore({ browser, selectors, url }) {
+    await browser.getElement(selectors?.more)
+    let content = await browser.getContent(url, false)
+    let html = load(content.toString())
+    let divNextPage = []
+    let counter = 0
+    do {
+      divNextPage = html(selectors.more)
+      if (divNextPage?.length) {
+        const listContentOld = html(selectors.content)
+        await browser.click(selectors.more)
+
+        await setTimeout(200)
+        await browser.getElement(selectors?.more)
+        content = await browser.getContent(url, false)
+        html = load(content.toString())
+        const listContentNew = html(selectors.content)
+        counter++
+        if (listContentNew.length - listContentOld.length > 0) {
+          logger.info(`Page: ${counter} - ${listContentNew.length - listContentOld.length} - ${listContentNew.length} - ${url}`)
+
+        }
+      } else {
+        divNextPage = []
+      }
+    } while (divNextPage?.length)
+  }
+
+  /**
+   * @param {Object} param 
+   * @param {Browser} param.browser 
+   * @param {String} param.url
+   * @param {String} param.baseUrl
+   * @param {Object} param.selectors
+   * @param {number} param.numberPage
+   */
+  async getMangasInPage({ browser, url, selectors, numberPage, baseUrl }) {
+    logger.info(url)
+    let content = await browser.getContent(url)
+    if (selectors?.contentFilterAll) {
+      await setTimeout(3000)
+      await browser.click(selectors.contentFilterAll)
+      if (selectors.contentFilterAccept) {
+        await setTimeout(3000)
+        await browser.click(selectors.contentFilterAccept)
+      }
+      content = await browser.getContent(url, false)
+    }
+    let html = load(content.toString())
+
+    let nextUrl = null
+    if (selectors?.more) {
+      for (let index = 0; index < 3; index++) {
+        try {
+          await this.clickMore({ browser, selectors, url })
+          break
+        } catch (error) {
+          console.log(error);
+        }
+      }
+      content = await browser.getContent(url, false)
+      html = load(content.toString())
+    } else {
+      const divNextPage = html(selectors.nextPage)
+      const a = this.getNextUrl(divNextPage, numberPage)
+      nextUrl = a.nextUrl
+      numberPage = a.numberPage
+    }
+
+    const listContent = html(selectors.content)
+    const listContentName = html(selectors.contentName)
+    const listMangas = []
+    for (let index = 0; index < listContent.length; index++) {
+      const item = listContent[index]
+      const itemName = selectors.contentName ? listContentName[index] : item
+      // for (const item of listContent) {
+      try {
+        const link = item.attribs.href
+          ? item.attribs.href.includes('https://')
+            ? item.attribs.href
+            : `${baseUrl}${item.attribs.href}`
+          : null
+        const manga = {
+          link,
+          name: itemName.children[0].data,
+        }
+        if (!manga.name || !manga.link) continue
+        listMangas.push(manga)
+      } catch (error) { }
+    }
+    if (!nextUrl) return { listMangas, nextUrl, numberPage }
+    await setTimeout(100)
+    const newUrl = nextUrl.includes('https://') ? nextUrl : `${baseUrl}${nextUrl}`
+    return { listMangas, nextUrl: newUrl, numberPage }
+  }
+
+  /**
+   * @returns {AsyncGenerator<{link:String,name:String}[]}
+   */
+  async * getAllMangas({
     url = '',
     baseUrl = '',
     api,
@@ -156,57 +265,36 @@ export default class Extractor {
     await browser.init()
 
     if (browserContent?.headers) {
-      browser.set(browserContent?.headers)
+      browserContent.headers.referer = baseUrl
+      browser.set(browserContent.headers)
+    } else {
+      browserContent.headers.referer = baseUrl
+      browser.set(browserContent.headers)
     }
     let numberPage = selectors.numberPage
-    const getUrls = async (url) => {
-      logger.info(url)
-      const content = await browser.getContent(url)
-      // const data = await page.buffer();
-      // const ppp = content.toString()
-      // await writeFile('./test.html', ppp)
-      const html = load(content.toString())
-      const divNextPage = html(selectors.nextPage)
-      const a = this.getNextUrl(divNextPage, numberPage)
-      const nextUrl = a.nextUrl
-      numberPage = a.numberPage
-
-      const listContent = html(selectors.content)
-      const listContentName = html(selectors.contentName)
-      const listMangas = []
-      for (let index = 0; index < listContent.length; index++) {
-        const item = listContent[index]
-        const itemName = selectors.contentName ? listContentName[index] : item
-        // for (const item of listContent) {
-        try {
-          const link = item.attribs.href
-            ? item.attribs.href.includes(baseUrl)
-              ? item.attribs.href
-              : `${baseUrl}${item.attribs.href}`
-            : null
-          const manga = {
-            link,
-            name: itemName.children[0].data,
+    try {
+      const maxRetry = 3
+      do {
+        let counter = 0
+        for (let index = 1; index <= maxRetry; index++) {
+          try {
+            const { listMangas, nextUrl, numberPage: np } = await this.getMangasInPage({ browser, url, numberPage, selectors, baseUrl })
+            url = nextUrl
+            numberPage = np
+            yield listMangas
+            break
+          } catch (error) {
+            await setTimeout(1000)
+            logger.warn(`retry ${index}\n ${error}`)
           }
-          if (!manga.name || !manga.link) continue
-          listMangas.push(manga)
-        } catch (error) { }
-      }
-      if (!nextUrl) return listMangas
-      for (let index = 0; index < 3; index++) {
-        try {
-          await setTimeout(100)
-          return listMangas.concat(await getUrls(`${baseUrl}${nextUrl}`))
-        } catch (error) {
-          await setTimeout(1000)
-          logger.warn(`retry ${index}\n ${error}`)
         }
-      }
-      return listMangas
+        if (counter === maxRetry) url = null
+      } while (url)
+    } catch (error) {
+      await browser.close()
     }
-    const mangas = await getUrls(url)
     await browser.close()
-    return mangas
+    // const mangas = await getUrls(url)
   }
 
   async listEp({

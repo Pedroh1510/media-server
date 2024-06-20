@@ -51,5 +51,4 @@ server.use(error)
 
 server.listen(CONFIG.port, () => logger.info(`listen ${CONFIG.port}`))
 
-const queue = new QueueService()
-queue.execute()
+

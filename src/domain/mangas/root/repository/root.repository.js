@@ -107,6 +107,9 @@ export default class RootRepository {
     return this.#prisma.mangas.findFirstOrThrow({
       include: {
         Chapters: true,
+        siteManga: {
+          include: { SiteMangaSelector: true },
+        },
       },
       where: {
         id: mangaId,

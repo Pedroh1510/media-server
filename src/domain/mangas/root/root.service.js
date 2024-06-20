@@ -101,9 +101,16 @@ export default class RootService {
 
   async processManga(mangaId) {
     mangaId = parseInt(mangaId)
-    const { type, link } = await this.repository.getManga(mangaId)
-    const site = sites[type]
-    const eps = await this.extractor.listEp({ ...site, url: link })
+    const { link, siteManga } = await this.repository.getManga(mangaId)
+    const headers = !siteManga.cookie ? undefined : { headers: { Cookie: siteManga.cookie } }
+    const eps = await this.extractor.listEp({
+      browserContent: {
+        headers,
+      },
+      selectors: siteManga.SiteMangaSelector,
+      url: link,
+      baseUrl: new URL(siteManga.url).origin,
+    })
     for (const ep of eps) {
       await this.repository.registerChapter({ ...ep, mangaId })
     }
@@ -184,7 +191,7 @@ export default class RootService {
     await mangaQueue.add(
       { mangaId },
       {
-        removeOnComplete: { age: 3600 },
+        removeOnComplete: { age: 60 },
         delay: 200,
         attempts: 3,
       }
@@ -195,7 +202,7 @@ export default class RootService {
     await mangaQueue.add(
       { mangaId, chapterId },
       {
-        removeOnComplete: { age: 3600 },
+        removeOnComplete: { age: 60 },
         delay: 200,
         attempts: 3,
       }

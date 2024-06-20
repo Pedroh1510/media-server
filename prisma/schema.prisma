@@ -34,11 +34,48 @@ model Mangas {
   siteManga   SiteManga? @relation(fields: [idSiteManga], references: [id])
 }
 
+model MangasCatalog {
+  id          Int        @id @default(autoincrement())
+  name        String
+  link        String
+  idSiteManga Int?
+  siteManga   SiteManga? @relation(fields: [idSiteManga], references: [id])
+
+  @@unique([name, idSiteManga, link])
+}
+
 model SiteManga {
-  id           Int      @id @default(autoincrement())
-  name         String   @unique
-  autoDownload Boolean  @default(false)
-  Mangas       Mangas[]
+  id                Int                @id @default(autoincrement())
+  name              String             @unique
+  autoDownload      Boolean            @default(false)
+  url               String?
+  cookie            String?
+  Mangas            Mangas[]
+  SiteMangaSelector SiteMangaSelector?
+  MangasCatalog     MangasCatalog[]
+}
+
+model SiteMangaSelector {
+  id                  Int       @id @default(autoincrement())
+  siteManga           SiteManga @relation(fields: [idSiteManga], references: [id])
+  idSiteManga         Int       @unique
+  nextPage            String?
+  content             String?
+  ep                  String?
+  image               String?
+  numberPage          String?
+  epName              String?
+  moreEp              String?
+  contentName         String?
+  more                String?
+  pageNumber          String?
+  contentFilterAll    String?
+  contentFilterAccept String?
+  nextButton          String?
+  selectModeKey       String?
+  selectModeValue     String?
+  nextPageEp          String?
+  numberPageEp        String?
 }
 
 model Chapters {
