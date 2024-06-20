@@ -50,8 +50,16 @@ export default class QueueService {
       }),
     }
 
-    animeQueue.add('', null, { repeat: { cron: '30 * * * *' }, removeOnComplete: true, removeOnFail: { age: 1800 } })
-    admAnimeQueue.add('', null, { repeat: { pattern: '1 * * * *' }, removeOnComplete: true, removeOnFail: { age: 60 } })
+    animeQueue.add('cron', null, {
+      repeat: { cron: '30 * * * *' },
+      removeOnComplete: true,
+      removeOnFail: { age: 1800 },
+    })
+    admAnimeQueue.add('cron', null, {
+      repeat: { pattern: '1 * * * *' },
+      removeOnComplete: true,
+      removeOnFail: { age: 60 },
+    })
   }
 }
 

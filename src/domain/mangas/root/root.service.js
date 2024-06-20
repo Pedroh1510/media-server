@@ -189,6 +189,7 @@ export default class RootService {
 
   async addQueueManga(mangaId) {
     await mangaQueue.add(
+      'process manga',
       { mangaId },
       {
         removeOnComplete: { age: 60 },
@@ -200,6 +201,7 @@ export default class RootService {
 
   async addQueueImage(mangaId, chapterId) {
     await mangaQueue.add(
+      'process manga image',
       { mangaId, chapterId },
       {
         removeOnComplete: { age: 60 },

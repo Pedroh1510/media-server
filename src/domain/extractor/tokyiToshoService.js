@@ -1,11 +1,12 @@
 import axios from 'axios'
-import XmlService from '../shared/xmlService.js'
-import TorrentService from '../shared/torrentService.js'
+
 import DateFormatter from '../../utils/dateFormatter.js'
 import logger from '../../utils/logger.js'
+import TorrentService from '../shared/torrentService.js'
+import XmlService from '../shared/xmlService.js'
 
 export default class TokyoToshoService {
-  constructor () {
+  constructor() {
     this.xmlService = new XmlService()
     this.torrentService = new TorrentService()
     this.acceptedTags = ['pt-bt', 'por-br', 'pt-br']
@@ -15,14 +16,16 @@ export default class TokyoToshoService {
    * @param {string} term
    * @returns {Promise<string>}
    */
-  async #searchXml (term = undefined) {
-    return axios.get('https://www.tokyotosho.info/rss.php', {
-      params: {
-        filter: ['1', '10', '3', '8', '4', '12', '13', 14, 15, 5],
-        terms: 'Detective Conan'
-        // terms:term
-      }
-    }).then(response => response.data)
+  async #searchXml(term = undefined) {
+    return axios
+      .get('https://www.tokyotosho.info/rss.php', {
+        params: {
+          filter: ['1', '10', '3', '8', '4', '12', '13', 14, 15, 5],
+          terms: 'Detective Conan',
+          // terms:term
+        },
+      })
+      .then((response) => response.data)
       .catch((e) => {
         return null
       })
@@ -31,7 +34,7 @@ export default class TokyoToshoService {
   /**
    * @param {string} title
    */
-  #isAcceptedTitle (title) {
+  #isAcceptedTitle(title) {
     const a = title.toLowerCase()
     return this.acceptedTags.some((tag) => a.includes(tag))
   }
@@ -40,7 +43,7 @@ export default class TokyoToshoService {
    * @param {string} term
    * @returns {AsyncGenerator<{title: string, link: string, date: Date}>}
    */
-  async * extractor (term) {
+  async *extractor(term) {
     logger.info('Extractor TokyoTosho -> start')
     const xml = await this.#searchXml(term)
     if (!xml) return
@@ -56,7 +59,7 @@ export default class TokyoToshoService {
       yield {
         title: item.title,
         link: this.torrentService.infoHashToMagnet(item['nyaa:infoHash']),
-        date: DateFormatter.toDate(dateIgnoreWeekday, 'DD MMM YYYY HH:mm:ss ZZ')
+        date: DateFormatter.toDate(dateIgnoreWeekday, 'DD MMM YYYY HH:mm:ss ZZ'),
       }
     }
 
