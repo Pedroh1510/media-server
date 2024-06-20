@@ -1,7 +1,7 @@
-import { PrismaClient } from '@prisma/client'
+import DbService from '../../../../infra/service/dbService.js'
 
 export default class RootRepository {
-  #prisma = new PrismaClient()
+  #prisma = DbService.connection
   async register({ link, name, type }) {
     return this.#prisma.mangas.create({
       data: {

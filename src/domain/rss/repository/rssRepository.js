@@ -1,7 +1,7 @@
-import { PrismaClient } from '@prisma/client'
+import DbService from '../../../infra/service/dbService.js'
 
 export default class RssRepository {
-  #prisma = new PrismaClient()
+  #prisma = DbService.connection
   async list({ term = undefined, limit = undefined }) {
     let where
     if (term) {

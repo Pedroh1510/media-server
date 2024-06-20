@@ -1,7 +1,7 @@
-import { PrismaClient } from '@prisma/client'
+import DbService from '../../../infra/service/dbService.js'
 
 export default class AdmRepository {
-  #prisma = new PrismaClient()
+  #prisma = DbService.connection
 
   async *listAll() {
     const total = await this.count()
