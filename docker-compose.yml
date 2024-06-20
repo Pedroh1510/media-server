@@ -3,7 +3,7 @@ services:
     image: pedroh1510/rss:latest
     build: .
     container_name: rss
-    command: 'npm run autogen && npm run server'
+    command: npm run server
     ports:
       - 4000:4000
     environment:

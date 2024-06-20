@@ -1,5 +1,5 @@
-import QueueService from "./job.js"
-import logger from "./utils/logger.js"
+import QueueService from './job.js'
+import logger from './utils/logger.js'
 
 const queue = new QueueService()
 
@@ -18,13 +18,13 @@ process.on('SIGINT', () => {
   gracefull()
 })
 process.on('SIGTERM', () => {
-  console.log('SIGTERM signal received.');
+  console.log('SIGTERM signal received.')
   process.exit(1)
-});
+})
 process.on('exit', () => {
-  console.log('exit.');
-});
+  console.log('exit.')
+})
 
 process.on('uncaughtException', () => {
-  console.log('SIGTERM signal received.');
-});
+  console.log('SIGTERM signal received.')
+})

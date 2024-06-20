@@ -46,6 +46,6 @@ COPY --from=builder dist /app/dist
 
 ENV port=3333
 EXPOSE 3333
-
+RUN npm run autogen
 # CMD [ "node","ppp.js" ]
 CMD [ "npm","run","start" ]
