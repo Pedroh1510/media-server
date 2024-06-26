@@ -8,7 +8,8 @@
     "lint": "eslint . --fix",
     "test": "vitest",
     "autogen": "node src/infra/swagger/autogen.js",
-    "server": "node src/server.js",
+    "server": "npm run autogen && node src/server.js",
+    "serverDev": "node --env-file=.env src/server.js",
     "job": "node src/jobsServer.js",
     "dev": "node --env-file=.env src/infra/swagger/autogen.js && (node --env-file=.env src/server.js & node --env-file=.env src/jobsServer.js)",
     "start": "npm run autogen && (npm run server & npm run job)"
