@@ -26,6 +26,8 @@ services:
           cpus: '0.5'
     networks:
       - proxy
+      - database
+      - cache
     labels:
       - traefik.enable=true
       - traefik.http.routers.rss-router.rule=Host(`rss.${DOMAIN}`)
@@ -56,8 +58,16 @@ services:
         limits:
           cpus: '0.5'
     networks:
-      - proxy
+      - database
+      - cache
+      - torrent
 
 networks:
   proxy:
+    external: true
+  database:
+    external: true
+  cache:
+    external: true
+  torrent:
     external: true
