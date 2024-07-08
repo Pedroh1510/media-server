@@ -34,7 +34,7 @@ services:
       - traefik.http.routers.rss-router.entrypoints=websecure
       - traefik.http.routers.rss-router.tls=true
       - traefik.http.services.rss-router.loadbalancer.server.port=4000
-      # - traefik.docker.network=proxy
+      - traefik.docker.network=proxy
 
   rss-jobs:
     image: pedroh1510/rss:latest
