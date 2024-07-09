@@ -1,11 +1,11 @@
 # FROM node:20-slim AS builder
-FROM node:20-alpine AS builder
+FROM node:20.10-alpine AS builder
 COPY frontend .
 RUN npm ci --silent
 RUN npm run build
 
 # FROM node:20-slim as runner
-FROM node:20-alpine as runner
+FROM node:20.10-alpine as runner
 WORKDIR /app
 # RUN apk upgrade --update-cache --available && \
 #   apk add openssl && \
