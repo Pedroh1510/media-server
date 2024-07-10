@@ -26,7 +26,7 @@ export default class RssService {
     const { term: q, t, scanAllItems } = data
     let term = q ?? t
     if (term) {
-      term = term.replace(/ [sS]\d{1,}(.*)/, '')
+      term = term.replace(/ [sS]\d{1,}(.*)/g, '')
     }
     logger.info(`List -> with term ${term} -- ${JSON.stringify(data ?? {})}`)
     await this.extractorService.extractorRss({ q: term }, !!scanAllItems)
