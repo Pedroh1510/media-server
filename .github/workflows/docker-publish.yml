@@ -68,6 +68,8 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
+          tags: pedroh1510/rss:latest,pedroh1510/rss:${{ github.run_number }}
+          # tags: agasdrm/blog:latest,agasdrm/blog:${{ github.run_number }}
           platforms: linux/amd64,linux/arm64/v8
           cache-from: type=local,src=/tmp/.buildx-cache
           cache-to: type=local,dest=/tmp/.buildx-cache
