@@ -39,7 +39,7 @@ services:
 
   rss-jobs:
     image: pedroh1510/rss:latest
-    build: .
+    # build: .
     container_name: rss-jobs
     command: npm run job
     environment:

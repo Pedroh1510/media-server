@@ -9,7 +9,7 @@ import mangasRouter from './domain/mangas/routes.js'
 import rssRouter from './domain/rss/routes.js'
 import CONFIG from './infra/config.js'
 import SwaggerDoc from './infra/swagger/swaggerDoc.js'
-import QueueService, { queueRoute } from './job.js'
+import { queueRoute } from './job.js'
 import logger from './utils/logger.js'
 
 const server = express()
