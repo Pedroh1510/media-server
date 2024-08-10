@@ -3,8 +3,7 @@ import { qBittorrentClient as QBittorrent } from '@robertklep/qbittorrent'
 import CONFIG from '../config.js'
 export default class BittorrentService {
   constructor() {
-    const url = 'http://192.168.1.23:8080'
-    this.client = new QBittorrent(url, CONFIG.userTorrent, CONFIG.passTorrent)
+    this.client = new QBittorrent(CONFIG.urlTorrent, CONFIG.userTorrent, CONFIG.passTorrent)
   }
 
   /**
