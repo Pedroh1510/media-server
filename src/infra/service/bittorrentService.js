@@ -1,16 +1,16 @@
 import { qBittorrentClient as QBittorrent } from '@robertklep/qbittorrent'
 
+import logger from '../../utils/logger.js'
 import CONFIG from '../config.js'
 export default class BittorrentService {
-  constructor() {
-    this.client = new QBittorrent(CONFIG.urlTorrent, CONFIG.userTorrent, CONFIG.passTorrent)
-  }
+  #client = new QBittorrent(CONFIG.urlTorrent, CONFIG.userTorrent, CONFIG.passTorrent)
 
   /**
    * @returns {Promise<{hash: string, dateCompleted: Date, name: string}[]>}
    */
   async listTorrentsConcluded() {
-    const list = await this.client.torrents.info()
+    logger.info(`Listing torrents concluded ${CONFIG.urlTorrent} - ${CONFIG.userTorrent} - ${CONFIG.passTorrent}`)
+    const list = await this.#client.torrents.info()
     return list
       .map((item) => ({
         ...item,
@@ -20,10 +20,10 @@ export default class BittorrentService {
   }
 
   async deleteTorrents(listHashes) {
-    await this.client.torrents.delete(listHashes, true)
+    await this.#client.torrents.delete(listHashes, true)
   }
 
   async stopTorrents(listHashes) {
-    await this.client.torrents.pause(listHashes)
+    await this.#client.torrents.pause(listHashes)
   }
 }
