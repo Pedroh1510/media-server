@@ -5,10 +5,10 @@ import logger from '../utils/logger.js'
 export default async function animeQueueJob() {
   const extractorService = new ExtractorService()
   const process = async () => {
-    logger.info('startCron')
+    logger.info('startCron animeQueueJob')
     await extractorService.scan({ total: 5 }).catch(() => ({}))
     await DbService.connection.$disconnect()
-    logger.info('endCron')
+    logger.info('endCron animeQueueJob')
   }
   return process()
 }

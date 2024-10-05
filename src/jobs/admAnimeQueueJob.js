@@ -5,10 +5,12 @@ import logger from '../utils/logger.js'
 export default async function animeQueueJob() {
   const admService = new AdmService()
   const process = async () => {
-    logger.info('startCron')
-    await admService.deleteFiles().catch(() => ({}))
+    logger.info('startCron animeQueueJob')
+    await admService.deleteFiles().catch((error) => {
+      logger.error(error)
+    })
     await DbService.connection.$disconnect()
-    logger.info('endCron')
+    logger.info('endCron animeQueueJob')
   }
   return process()
 }
