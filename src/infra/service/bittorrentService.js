@@ -1,6 +1,5 @@
 import { qBittorrentClient as QBittorrent } from '@robertklep/qbittorrent'
 
-import logger from '../../utils/logger.js'
 import CONFIG from '../config.js'
 export default class BittorrentService {
   #client = new QBittorrent(CONFIG.urlTorrent, CONFIG.userTorrent, CONFIG.passTorrent)
@@ -9,7 +8,6 @@ export default class BittorrentService {
    * @returns {Promise<{hash: string, dateCompleted: Date, name: string}[]>}
    */
   async listTorrentsConcluded() {
-    logger.info(`Listing torrents concluded ${CONFIG.urlTorrent} - ${CONFIG.userTorrent} - ${CONFIG.passTorrent}`)
     const list = await this.#client.torrents.info()
     return list
       .map((item) => ({

@@ -25,19 +25,29 @@ export default class AdmService {
   async deleteFiles() {
     const listTorrents = await this.bittorrentService.listTorrentsConcluded()
     logger.info(`Total de torrents concluidos ${listTorrents.length}`)
-    await this.bittorrentService.stopTorrents(listTorrents.map(({ hash }) => hash))
+    const listTorrentsStopped = []
+    for (const torrent of listTorrents) {
+      await this.bittorrentService
+        .stopTorrents(torrent.hash)
+        .then(() => {
+          listTorrentsStopped.push(torrent)
+        })
+        .catch((error) => {
+          logger.error(`erro ao parar torrent ${torrent.name} --> ${torrent.hash}, ${error.message} \n${error.stack}`)
+        })
+    }
 
     const maxHourLifeTime = 2
-    const listTorrentsConcludedExpired = listTorrents.filter(
+    const listTorrentsConcludedExpired = listTorrentsStopped.filter(
       (item) => DateFormatter.diff(Date.now(), item.dateCompleted, 'hour') > maxHourLifeTime
     )
 
     logger.info(`Total de torrents concluidos expirados(${maxHourLifeTime}h): ${listTorrentsConcludedExpired.length}`)
     if (!listTorrentsConcludedExpired.length)
-      return { total: listTorrents.length, totalDeleted: listTorrentsConcludedExpired.length }
+      return { total: listTorrentsStopped.length, totalDeleted: listTorrentsConcludedExpired.length }
     await this.bittorrentService.deleteTorrents(listTorrentsConcludedExpired.map((item) => item.hash))
     return {
-      total: listTorrents.length,
+      total: listTorrentsStopped.length,
       totalDeleted: listTorrentsConcludedExpired.length,
       deleled: listTorrentsConcludedExpired.map(({ name }) => name),
     }
@@ -73,7 +83,7 @@ export default class AdmService {
           await this.repository
             .insert(c)
             .then(() => totalInserted++)
-            .catch(() => {})
+            .catch(() => { })
           cb(null)
         },
       })
@@ -91,12 +101,12 @@ export default class AdmService {
     if (acceptedTags && acceptedTags.length) {
       if (!Array.isArray(acceptedTags)) throw new Error('acceptedTags deve ser um array')
       if (!acceptedTags.length) throw new Error('acceptedTags n deve ser vazio')
-      await this.repository.insertAcceptedTags(acceptedTags.map((tag) => ({ tag }))).catch(() => {})
+      await this.repository.insertAcceptedTags(acceptedTags.map((tag) => ({ tag }))).catch(() => { })
     }
     if (verifyTags && verifyTags.length) {
       if (!Array.isArray(verifyTags)) throw new Error('verifyTags deve ser um array')
       if (!verifyTags.length) throw new Error('verifyTags n deve ser vazio')
-      await this.repository.insertVerifyTags(verifyTags.map((tag) => ({ tag }))).catch(() => {})
+      await this.repository.insertVerifyTags(verifyTags.map((tag) => ({ tag }))).catch(() => { })
     }
   }
 
