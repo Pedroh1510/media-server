@@ -50,5 +50,3 @@ server.use(errors())
 server.use(error)
 
 server.listen(CONFIG.port, () => logger.info(`listen ${CONFIG.port}`))
-
-

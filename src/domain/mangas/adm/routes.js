@@ -14,20 +14,47 @@ admRouter.post('/', validator.updateHeaders(), (req, res) => {
   res.send()
 })
 
-admRouter.get('/', (_req, res) => {
-  res.send(service.getTypes())
-})
+admRouter.get(
+  '/',
+  (_req, res) => {
+    res.send(service.getTypes())
+  } /* 
+  #swagger.tags = ["Adm Mangas"] 
+  #swagger.path = '/mangas/adm'
+*/
+)
 
-admRouter.post('/catalog', async (req, res) => {
-  await service.processCatalog(req.body)
-  res.send()
-})
-admRouter.get('/catalog', async (req, res) => {
-  const data = await service.searchInCatalog(req.query?.term)
-  res.send(data)
-})
+admRouter.post(
+  '/catalog',
+  async (req, res) => {
+    await service.processCatalog(req.body)
+    res.send()
+  }
+  /* 
+  #swagger.tags = ["Adm Mangas"] 
+  #swagger.path = '/mangas/adm/catalog'
+*/
+)
+admRouter.get(
+  '/catalog',
+  async (req, res) => {
+    const data = await service.searchInCatalog(req.query?.term)
+    res.send(data)
+  }
+  /* 
+  #swagger.tags = ["Adm Mangas"] 
+  #swagger.path = '/mangas/adm/catalog'
+*/
+)
 
-admRouter.get('/:type', (req, res) => {
-  const headers = service.getHeaders({ type: req.params.type })
-  res.send(headers)
-})
+admRouter.get(
+  '/:type',
+  (req, res) => {
+    const headers = service.getHeaders({ type: req.params.type })
+    res.send(headers)
+  }
+  /* 
+  #swagger.tags = ["Adm Mangas"] 
+  #swagger.path = '/mangas/adm/{type}'
+*/
+)
