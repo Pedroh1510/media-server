@@ -83,7 +83,7 @@ export default class AdmService {
           await this.repository
             .insert(c)
             .then(() => totalInserted++)
-            .catch(() => { })
+            .catch(() => ({}))
           cb(null)
         },
       })
@@ -101,12 +101,12 @@ export default class AdmService {
     if (acceptedTags && acceptedTags.length) {
       if (!Array.isArray(acceptedTags)) throw new Error('acceptedTags deve ser um array')
       if (!acceptedTags.length) throw new Error('acceptedTags n deve ser vazio')
-      await this.repository.insertAcceptedTags(acceptedTags.map((tag) => ({ tag }))).catch(() => { })
+      await this.repository.insertAcceptedTags(acceptedTags.map((tag) => ({ tag }))).catch(() => ({}))
     }
     if (verifyTags && verifyTags.length) {
       if (!Array.isArray(verifyTags)) throw new Error('verifyTags deve ser um array')
       if (!verifyTags.length) throw new Error('verifyTags n deve ser vazio')
-      await this.repository.insertVerifyTags(verifyTags.map((tag) => ({ tag }))).catch(() => { })
+      await this.repository.insertVerifyTags(verifyTags.map((tag) => ({ tag }))).catch(() => ({}))
     }
   }
 
