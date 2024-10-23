@@ -29,7 +29,7 @@ export default class RssService {
       term = term.replace(/ [sS]\d{1,}(.*)/g, '')
     }
     logger.info(`List -> with term ${term} -- ${JSON.stringify(data ?? {})}`)
-    if (isScan) {
+    if (isScan === 'true' || isScan === true) {
       await this.extractorService.extractorRss({ q: term }, !!scanAllItems)
     }
 
