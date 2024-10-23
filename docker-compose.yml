@@ -1,8 +1,8 @@
 services:
   rss:
-    # image: pedroh1510/rss:latest
+    image: pedroh1510/rss:latest
     # image:
-    build: .
+    # build: .
     container_name: rss
     command: npm run server
     ports:
