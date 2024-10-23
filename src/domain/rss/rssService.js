@@ -23,13 +23,15 @@ export default class RssService {
   }
 
   async list(data) {
-    const { term: q, t, scanAllItems } = data
+    const { term: q, t, scanAllItems, isScan = true } = data
     let term = q ?? t
     if (term) {
       term = term.replace(/ [sS]\d{1,}(.*)/g, '')
     }
     logger.info(`List -> with term ${term} -- ${JSON.stringify(data ?? {})}`)
-    await this.extractorService.extractorRss({ q: term }, !!scanAllItems)
+    if (isScan) {
+      await this.extractorService.extractorRss({ q: term }, !!scanAllItems)
+    }
 
     const response = await this.repository.list({
       term,
