@@ -8,8 +8,8 @@
     "lint": "eslint . --fix",
     "test": "vitest",
     "autogen": "node src/infra/swagger/autogen.js",
-    "server": "npm run autogen && node src/server.js",
-    "serverDev": "node --env-file=.env src/server.js",
+    "server": "npm run autogen && node --experimental-loader=newrelic/esm-loader.mjs src/server.js",
+    "serverDev": "node --env-file=.env  --watch --inspect --experimental-loader=newrelic/esm-loader.mjs src/server.js",
     "job": "node src/jobsServer.js",
     "dev": "node --env-file=.env src/infra/swagger/autogen.js && (node --env-file=.env src/server.js & node --env-file=.env src/jobsServer.js)",
     "start": "npm run autogen && (npm run server & npm run job)"
@@ -37,6 +37,7 @@
     "fast-xml-parser": "^4.5.0",
     "lodash": "^4.17.21",
     "morgan": "^1.10.0",
+    "newrelic": "^12.5.2",
     "parse-torrent": "^11.0.17",
     "puppeteer": "^23.5.0",
     "puppeteer-extra": "^3.3.6",

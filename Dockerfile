@@ -47,5 +47,6 @@ COPY --from=builder dist /app/dist
 ENV port=3333
 EXPOSE 3333
 RUN npm run autogen
+ENV NEW_RELIC_NO_CONFIG_FILE=true
 # CMD [ "node","ppp.js" ]
 CMD [ "npm","run","server" ]

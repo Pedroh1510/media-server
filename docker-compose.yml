@@ -18,6 +18,8 @@ services:
       - REDIS_HOST=${REDIS_HOST}
       - REDIS_PORT=${REDIS_PORT}
       - ERAI=${ERAI}
+      - NEW_RELIC_LICENSE_KEY=${NEW_RELIC_LICENSE_KEY}
+      - NEW_RELIC_APP_NAME=rss
     volumes:
       - ${DATA}/rss/db:/app/prisma/
       - ${DATA}/rss/downloads:/app/downloads

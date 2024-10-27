@@ -1,3 +1,4 @@
+import 'newrelic'
 import { errors } from 'celebrate'
 import cors from 'cors'
 import express from 'express'
