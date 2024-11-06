@@ -1,0 +1,81 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: rss
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: rss
+  template:
+    metadata:
+      labels:
+        app: rss
+    spec:
+      containers:
+        - name: rss
+          image: pedroh1510/rss:latest
+          resources:
+            limits:
+              memory: "500Mi"
+              cpu: "300m"
+          ports:
+            - containerPort: 4000
+          env:
+            - name: port
+              value: "4000"
+            - name: host
+              valueFrom:
+                secretKeyRef:
+                  name: rss-secret
+                  key: host
+            - name: TZ
+              valueFrom:
+                secretKeyRef:
+                  name: rss-secret
+                  key: tz
+            - name: DATABASE_URL
+              valueFrom:
+                secretKeyRef:
+                  name: rss-secret
+                  key: database-url
+            - name: user_torrent
+              valueFrom:
+                secretKeyRef:
+                  name: rss-secret
+                  key: user-torrent
+            - name: pass_torrent
+              valueFrom:
+                secretKeyRef:
+                  name: rss-secret
+                  key: pass-torrent
+            - name: REDIS_HOST
+              valueFrom:
+                secretKeyRef:
+                  name: rss-secret
+                  key: redis-host
+            - name: REDIS_PORT
+              valueFrom:
+                secretKeyRef:
+                  name: rss-secret
+                  key: redis-port
+            - name: ERAI
+              valueFrom:
+                secretKeyRef:
+                  name: rss-secret
+                  key: erai
+          livenessProbe:
+            httpGet:
+              port: 4000
+              path: /
+            initialDelaySeconds: 15
+            periodSeconds: 10
+            timeoutSeconds: 5
+            failureThreshold: 3
+      #     volumeMounts:
+      #       - mountPath: /app/downloads
+      #         name: downloads
+      # volumes:
+      #   - name: downloads
+      #     hostPath:
+      #       path:

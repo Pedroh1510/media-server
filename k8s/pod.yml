@@ -1,0 +1,60 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: rss
+  labels:
+    name: rss
+  namespace: lab
+spec:
+  containers:
+    - name: rss
+      image: pedroh1510/rss:latest
+      resources:
+        limits:
+          memory: "500Mi"
+          cpu: "300m"
+      ports:
+        - containerPort: 4000
+      env:
+        - name: port
+          value: "4000"
+        - name: host
+          valueFrom:
+            secretKeyRef:
+              name: rss-secret
+              key: host
+        - name: TZ
+          valueFrom:
+            secretKeyRef:
+              name: rss-secret
+              key: tz
+        - name: DATABASE_URL
+          valueFrom:
+            secretKeyRef:
+              name: rss-secret
+              key: database-url
+        - name: user_torrent
+          valueFrom:
+            secretKeyRef:
+              name: rss-secret
+              key: user-torrent
+        - name: pass_torrent
+          valueFrom:
+            secretKeyRef:
+              name: rss-secret
+              key: pass-torrent
+        - name: REDIS_HOST
+          valueFrom:
+            secretKeyRef:
+              name: rss-secret
+              key: redis-host
+        - name: REDIS_PORT
+          valueFrom:
+            secretKeyRef:
+              name: rss-secret
+              key: redis-port
+        - name: ERAI
+          valueFrom:
+            secretKeyRef:
+              name: rss-secret
+              key: erai
