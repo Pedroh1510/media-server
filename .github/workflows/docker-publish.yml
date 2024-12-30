@@ -14,11 +14,9 @@ on:
         required: true
   workflow_dispatch:
   push:
-    branches: ["main"]
+    branches: ['main']
     # Publish semver tags as releases.
-    tags: ["v*.*.*"]
-  pull_request:
-    branches: ["main"]
+    tags: ['v*.*.*']
 
 # jobs:
 #   push_to_registry:
