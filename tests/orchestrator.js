@@ -1,5 +1,6 @@
 import retry from 'async-retry'
 import axios from 'axios'
+import { execSync } from 'node:child_process'
 
 import CONFIG from '../src/infra/config.js'
 
@@ -11,7 +12,7 @@ async function waitForAllServices() {
   await waitForWebServer()
   async function waitForWebServer() {
     async function fetchStatusPage() {
-      const response = await api.get('rss/amount')
+      const response = await api.get('/status')
       if (response.status !== 200) {
         throw new Error()
       }
@@ -24,10 +25,15 @@ async function waitForAllServices() {
   }
 }
 
+function applyMigrations() {
+  execSync('npm run migration:push')
+}
+
 const orchestrator = {
   waitForAllServices,
   api,
   baseUrl,
+  applyMigrations,
 }
 
 export default orchestrator

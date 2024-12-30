@@ -31,6 +31,7 @@ const seed = async () => {
 }
 beforeAll(async () => {
   await orchestrator.waitForAllServices()
+  orchestrator.applyMigrations()
 })
 beforeEach(async () => {
   await clean()

@@ -7,6 +7,7 @@ import admRouter from './domain/adm/routes.js'
 import extractorRouter from './domain/extractor/routes.js'
 import mangasRouter from './domain/mangas/routes.js'
 import rssRouter from './domain/rss/routes.js'
+import statusRouter from './domain/status/routes.js'
 import CONFIG from './infra/config.js'
 import SwaggerDoc from './infra/swagger/swaggerDoc.js'
 import { queueRoute } from './job.js'
@@ -38,6 +39,7 @@ server.use('/extractor', extractorRouter)
 
 server.use('/adm', admRouter)
 server.use('/queues', queueRoute)
+server.use('/status', statusRouter)
 server.get('/api', (_, res) => res.send('OK'))
 
 function error(err, req, res, next) {
