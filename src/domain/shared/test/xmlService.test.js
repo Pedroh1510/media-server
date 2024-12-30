@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 
+import orchestrator from '../../../../tests/orchestrator.js'
 import XmlService from '../xmlService.js'
 
 const sut = () => {
@@ -50,8 +51,8 @@ describe('xmlService', () => {
   <channel>
     <title>Nyaa - Home - Torrent File RSS</title>
     <description>RSS Feed for Home</description>
-    <link>http://localhost:3000/</link>
-    <atom:link href="http://localhost:3000" rel="self" type="application/rss+xml"></atom:link>
+    <link>${orchestrator.baseUrl}/</link>
+    <atom:link href="${orchestrator.baseUrl}" rel="self" type="application/rss+xml"></atom:link>
     <language>en</language>
   </channel>
 </rss>
@@ -67,8 +68,8 @@ describe('xmlService', () => {
   <channel>
     <title>Nyaa - Home - Torrent File RSS</title>
     <description>RSS Feed for Home</description>
-    <link>http://localhost:3000/</link>
-    <atom:link href="http://localhost:3000" rel="self" type="application/rss+xml"></atom:link>
+    <link>${orchestrator.baseUrl}/</link>
+    <atom:link href="${orchestrator.baseUrl}" rel="self" type="application/rss+xml"></atom:link>
     <language>en</language>
     <item>
       <title>test</title>

@@ -56,7 +56,8 @@ export default class NyaaService {
    */
   async *extractor(term, processAllItems = false) {
     logger.info('Extractor Nyaa -> start')
-    const xml = await this.#searchXml(term)
+    const query = term?.q ?? term
+    const xml = await this.#searchXml(query)
     if (!xml) return
     const json = this.xmlService.parserToJson(xml)
     const isValidXml = json?.rss && json.rss?.channel && json.rss.channel?.item !== undefined
@@ -82,8 +83,9 @@ export default class NyaaService {
         return null
       }
 
+      const title = item.title?.toLowerCase()?.includes(query?.toLowerCase()) ? item.title : `${query} ${item.title}`
       return {
-        title: item.title,
+        title,
         link: this.torrentService.infoHashToMagnet(item['nyaa:infoHash']),
         date: DateFormatter.toDate(dateIgnoreWeekday, 'DD MMM YYYY HH:mm:ss ZZ'),
       }
