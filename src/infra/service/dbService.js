@@ -1,6 +1,10 @@
 import { PrismaClient } from '@prisma/client'
 
-const prisma = new PrismaClient()
+import CONFIG from '../config.js'
+
+const prisma = new PrismaClient({
+  datasourceUrl: CONFIG.dbUrl,
+})
 
 export default class DbService {
   static connection = prisma
