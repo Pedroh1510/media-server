@@ -53,6 +53,40 @@ export default class RssService {
       }
     }
 
+    return items
+  }
+
+  async listAsXml(data) {
+    const { term: q, t, scanAllItems, isScan = true } = data
+    let term = q ?? t
+    if (term) {
+      term = term.replace(/ [sS]\d{1,}(.*)/g, '')
+    }
+    logger.info(`List -> with term ${term} -- ${JSON.stringify(data ?? {})}`)
+    if (isScan === 'true' || isScan === true) {
+      await this.extractorService.extractorRss({ q: term }, !!scanAllItems)
+    }
+
+    const response = await this.repository.list({
+      term,
+      limit: term ? undefined : 100,
+    })
+
+    const items = []
+
+    for (const item of response) {
+      try {
+        items.push({
+          ...item,
+          page: `http://192.168.0.19:${CONFIG.port}}/${item.id}`,
+          id: await this.torrentService.magnetInfo(item.magnet),
+          title: this.#formatTitle(item),
+        })
+      } catch (error) {
+        // logger.error(`list item => ${JSON.stringify(item)}`)
+      }
+    }
+
     return this.xmlService.buildToRss({ items })
   }
 
