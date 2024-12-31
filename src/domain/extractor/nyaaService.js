@@ -83,7 +83,9 @@ export default class NyaaService {
         return null
       }
 
-      const title = item.title?.toLowerCase()?.includes(query?.toLowerCase()) ? item.title : `${query} ${item.title}`
+      const title = item.title?.toLowerCase()?.includes(`${query}`.toLowerCase())
+        ? item.title
+        : `${query} ${item.title}`
       return {
         title,
         link,
