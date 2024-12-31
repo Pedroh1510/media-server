@@ -76,7 +76,7 @@ export default class NyaaService {
         if (!isValid) return null
       }
       const dateIgnoreWeekday = item.pubDate.split(', ').slice(1).join(', ')
-      const link = this.torrentService.infoHashToMagnet(item['nyaa:infoHash'])
+      const link = await this.torrentService.magnetByLinkFile(item.link)
       try {
         await this.torrentService.magnetInfo(link)
       } catch {
@@ -86,7 +86,7 @@ export default class NyaaService {
       const title = item.title?.toLowerCase()?.includes(query?.toLowerCase()) ? item.title : `${query} ${item.title}`
       return {
         title,
-        link: this.torrentService.infoHashToMagnet(item['nyaa:infoHash']),
+        link,
         date: DateFormatter.toDate(dateIgnoreWeekday, 'DD MMM YYYY HH:mm:ss ZZ'),
       }
     }

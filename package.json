@@ -14,6 +14,7 @@
     "test:ci": "npm run services:up && concurrently -n serverDev,vitest --hide serverDev1 -k -s command-vitest \"npm run serverDev\" \"npm run test\"",
     "test:unit": "npm run test --project unit",
     "test:integration": "npm run test --project integration",
+    "test:watch:integration": "vitest --project integration",
     "migration:push": "npx dotenv -e .env.development -- npx prisma db push",
     "autogen": "node src/infra/swagger/autogen.js",
     "server": "npm run autogen && node src/server.js",
