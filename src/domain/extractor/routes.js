@@ -31,4 +31,16 @@ extractorRouter.get(
    * #swagger.tags = ["Extractor"]
    */
 )
+
+extractorRouter.get(
+  '/:site',
+  async (req, res) => {
+    req.setTimeout(0)
+    const total = await extractorService.scanBySite(req.params.site, req.query)
+    res.send({ total })
+  }
+  /**
+   * #swagger.tags = ["Extractor"]
+   */
+)
 export default extractorRouter

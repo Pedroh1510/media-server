@@ -75,4 +75,15 @@ export default class ExtractorService {
     ])
     logger.info(`extractorRss -> end ${responses.reduce((p, c) => p + c, 0)}`)
   }
+
+  async scanBySite(site, filters) {
+    const fromTo = {
+      nyaa: (param) => this.nyaaService.extractor(param, true),
+      tosho: () => this.animeToshoService.extractor(),
+      erai: () => this.eraiService.extractor(),
+    }
+    if (!Object.keys(fromTo).includes(site)) throw new Error('Site not supported')
+    const responses = await Promise.all([this.#executeExtractor(() => fromTo[site](filters))])
+    return responses.reduce((p, c) => p + c, 0)
+  }
 }

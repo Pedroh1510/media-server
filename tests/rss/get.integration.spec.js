@@ -1,41 +1,14 @@
 import { beforeAll, beforeEach, describe, expect, test } from 'vitest'
 
-import DbService from '../../src/infra/service/dbService.js'
 import orchestrator from '../orchestrator.js'
 
-const clean = async () => {
-  await DbService.connection.$queryRaw`truncate "Torrent";`
-}
-
-const seed = async () => {
-  const tags = [
-    'portuguese(brazil)',
-    'pt(br)',
-    'portuguese (brazilian)',
-    'portuguese[br]',
-    'por-br',
-    'pt-bt',
-    'pt-br',
-    'portuguese',
-  ]
-  const verify = ['mult-sub', 'multi sub']
-
-  await DbService.connection.acceptedTags.createMany({
-    data: tags.map((tag) => ({ tag })),
-    skipDuplicates: true,
-  })
-  await DbService.connection.verifyTags.createMany({
-    data: verify.map((tag) => ({ tag })),
-    skipDuplicates: true,
-  })
-}
 beforeAll(async () => {
   await orchestrator.waitForAllServices()
   orchestrator.applyMigrations()
 })
 beforeEach(async () => {
-  await clean()
-  await seed()
+  await orchestrator.cleanDatabase()
+  await orchestrator.seedDatabase()
 })
 describe('RSS', () => {
   describe('Amount', () => {
@@ -60,8 +33,9 @@ describe('RSS', () => {
       })
 
       expect(response.status).toEqual(200)
-      expect(response.data)
-        .toEqual(`<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:nyaa="https://nyaa.si/xmlns/nyaa" version="2.0">
+      expect(
+        response.data
+      ).toEqual(`<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:nyaa="https://nyaa.si/xmlns/nyaa" version="2.0">
   <channel>
     <title>Nyaa - Home - Torrent File RSS</title>
     <description>RSS Feed for Home</description>
