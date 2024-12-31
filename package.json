@@ -8,6 +8,8 @@
     "services:up": "docker compose -f src/infra/docker/compose.yml up -d",
     "services:down": "docker compose -f src/infra/docker/compose.yml down",
     "lint": "eslint . --fix",
+    "lint:biome": "npx @biomejs/biome check ./src",
+    "lint:biome:fix": "npx @biomejs/biome check --fix ./src",
     "test": "vitest run",
     "test:ci": "npm run services:up && concurrently -n serverDev,vitest --hide serverDev1 -k -s command-vitest \"npm run serverDev\" \"npm run test\"",
     "test:unit": "npm run test --project unit",
@@ -54,6 +56,7 @@
     "winston-loki": "^6.1.3"
   },
   "devDependencies": {
+    "@biomejs/biome": "1.9.4",
     "concurrently": "^9.1.1",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",

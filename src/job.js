@@ -1,8 +1,8 @@
+import path from 'node:path'
 import { createBullBoard } from '@bull-board/api'
 import { BullMQAdapter } from '@bull-board/api/bullMQAdapter.js'
 import { ExpressAdapter } from '@bull-board/express'
 import { Queue, Worker } from 'bullmq'
-import path from 'node:path'
 
 import CONFIG from './infra/config.js'
 import logger from './utils/logger.js'

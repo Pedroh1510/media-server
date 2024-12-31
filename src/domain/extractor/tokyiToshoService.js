@@ -16,7 +16,7 @@ export default class TokyoToshoService {
    * @param {string} term
    * @returns {Promise<string>}
    */
-  async #searchXml(term = undefined) {
+  async #searchXml() {
     return axios
       .get('https://www.tokyotosho.info/rss.php', {
         params: {
@@ -26,7 +26,7 @@ export default class TokyoToshoService {
         },
       })
       .then((response) => response.data)
-      .catch((e) => {
+      .catch(() => {
         return null
       })
   }

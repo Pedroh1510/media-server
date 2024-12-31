@@ -27,7 +27,7 @@ const makeTransportLoki = () => {
         job: 'rss',
       },
     })
-  } catch (e) {
+  } catch {
     return new winston.transports.Console()
   }
 }

@@ -1,7 +1,7 @@
+import { setTimeout } from 'node:timers/promises'
 import AdmZip from 'adm-zip'
 import axios from 'axios'
 import { load } from 'cheerio'
-import { setTimeout } from 'node:timers/promises'
 
 import logger from '../../../utils/logger.js'
 import DownloadImageService from '../../shared/downloadImg.js'
@@ -90,7 +90,6 @@ export default class Extractor {
 
   async getAllMangasApi({
     url = '',
-    baseUrl = '',
     api = {
       pageLimit: 1,
       pageKey: 'page',
@@ -118,7 +117,7 @@ export default class Extractor {
           },
         })
         .then((response) => response.data)
-        .catch((e) => {
+        .catch(() => {
           return null
         })
       if (!content) break
@@ -139,7 +138,7 @@ export default class Extractor {
           }
           if (!manga.name || !manga.link) continue
           listMangas.push(manga)
-        } catch (error) { }
+        } catch {}
       }
       // hasNextPage = await browser.click(selectors.nextButton)
       await setTimeout(100)
@@ -237,7 +236,7 @@ export default class Extractor {
         }
         if (!manga.name || !manga.link) continue
         listMangas.push(manga)
-      } catch (error) { }
+      } catch {}
     }
     if (!nextUrl) return { listMangas, nextUrl, numberPage }
     await setTimeout(100)
@@ -295,7 +294,7 @@ export default class Extractor {
         }
         if (counter === maxRetry) url = null
       } while (url)
-    } catch (error) {
+    } catch {
       await browser.close()
     }
     await browser.close()
@@ -305,7 +304,6 @@ export default class Extractor {
   async listEp({
     url = '',
     baseUrl = '',
-    api = '',
     selectors = { ep: '', epName: '', moreEp: '', numberPageEp: '', nextPageEp: '' },
     browserContent = { headers: {} },
   }) {

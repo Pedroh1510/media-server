@@ -1,6 +1,6 @@
-import AdmZip from 'adm-zip'
-import { mkdir, writeFile, stat } from 'node:fs/promises'
+import { mkdir, stat, writeFile } from 'node:fs/promises'
 import { setTimeout } from 'node:timers/promises'
+import AdmZip from 'adm-zip'
 
 import { mangaQueue } from '../../../job.js'
 import logger from '../../../utils/logger.js'
@@ -61,7 +61,7 @@ export default class RootService {
         })
       }
       return images
-    } catch (error) {
+    } catch {
       return null
     }
   }

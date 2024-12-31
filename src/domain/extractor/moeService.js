@@ -32,7 +32,7 @@ export default class MoeService {
       const hour = html(this).text()
       const pageTags = html(this).find('a')
       const paragraphs = pageTags
-        .map((i, e) => {
+        .map((_, e) => {
           if (e.attribs?.href && e.attribs.href.includes('magnet')) {
             return e.attribs?.href
           }
@@ -92,7 +92,7 @@ export default class MoeService {
       if (!isAccept) return null
       const pubDate = pageDate.replace('Upload date: ', '')
       return { title, link, pubDate, hour: pubDate.split(' ')[1] }
-    } catch (error) {
+    } catch {
       return null
     }
   }
@@ -159,7 +159,7 @@ export default class MoeService {
       try {
         page = await moeApi.get(uri).then((res) => res.data)
         break
-      } catch (error) {}
+      } catch {}
     }
     if (!page) throw new Error('Falha na busca')
     const html = load(page)
@@ -197,7 +197,7 @@ export default class MoeService {
         if (!result) return null
         response.push(result)
         // }
-      } catch (e) {
+      } catch {
         return null
       }
     }

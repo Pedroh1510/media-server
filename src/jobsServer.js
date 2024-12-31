@@ -18,13 +18,16 @@ process.on('SIGINT', () => {
   gracefull()
 })
 process.on('SIGTERM', () => {
+  // biome-ignore lint/suspicious/noConsole: <explanation>
   console.log('SIGTERM signal received.')
   process.exit(1)
 })
 process.on('exit', () => {
+  // biome-ignore lint/suspicious/noConsole: <explanation>
   console.log('exit.')
 })
 
 process.on('uncaughtException', () => {
+  // biome-ignore lint/suspicious/noConsole: <explanation>
   console.log('SIGTERM signal received.')
 })

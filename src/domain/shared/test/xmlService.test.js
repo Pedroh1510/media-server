@@ -46,8 +46,9 @@ describe('xmlService', () => {
     it('should return a xml string with empty items', () => {
       const { service } = sut()
       const xml = service.buildToRss({ items: [] })
-      expect(xml)
-        .toEqual(`<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:nyaa="https://nyaa.si/xmlns/nyaa" version="2.0">
+      expect(
+        xml
+      ).toEqual(`<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:nyaa="https://nyaa.si/xmlns/nyaa" version="2.0">
   <channel>
     <title>Nyaa - Home - Torrent File RSS</title>
     <description>RSS Feed for Home</description>
@@ -63,8 +64,9 @@ describe('xmlService', () => {
       const xml = service.buildToRss({
         items: [{ title: 'test', id: 1, page: 'teste', pubDate: 'Fri, 05 Apr 2024 18:38:34 -0000', magnet: 'test' }],
       })
-      expect(xml)
-        .toEqual(`<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:nyaa="https://nyaa.si/xmlns/nyaa" version="2.0">
+      expect(
+        xml
+      ).toEqual(`<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:nyaa="https://nyaa.si/xmlns/nyaa" version="2.0">
   <channel>
     <title>Nyaa - Home - Torrent File RSS</title>
     <description>RSS Feed for Home</description>

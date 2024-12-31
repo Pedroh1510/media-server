@@ -42,7 +42,7 @@ server.use('/queues', queueRoute)
 server.use('/status', statusRouter)
 server.get('/api', (_, res) => res.send('OK'))
 
-function error(err, req, res, next) {
+function error(err, _req, res, _next) {
   logger.error({ err })
 
   res.status(500).send('Internal Server Error')
