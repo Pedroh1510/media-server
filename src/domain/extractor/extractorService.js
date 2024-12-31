@@ -82,7 +82,9 @@ export default class ExtractorService {
       tosho: () => this.animeToshoService.extractor(),
       erai: () => this.eraiService.extractor(),
     }
-    if (!Object.keys(fromTo).includes(site)) throw new Error('Site not supported')
+    if (!Object.keys(fromTo).includes(site) || typeof fromTo[site] !== 'function') {
+      throw new Error('Site not supported or invalid method')
+    }
     const responses = await Promise.all([this.#executeExtractor(() => fromTo[site](filters))])
     return responses.reduce((p, c) => p + c, 0)
   }
