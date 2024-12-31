@@ -1,11 +1,14 @@
 # FROM node:20-slim AS builder
-FROM node:20.10-alpine AS builder
+FROM node:20-alpine AS base
+RUN npm install -g npm
+
+FROM base AS builder
 COPY frontend .
 RUN npm ci --silent
 RUN npm run build
 
 # FROM node:20-slim as runner
-FROM node:20.10-alpine as runner
+FROM base AS runner
 WORKDIR /app
 # RUN apk upgrade --update-cache --available && \
 #   apk add openssl && \
@@ -33,7 +36,6 @@ ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 #   apt-get install google-chrome-stable -y --no-install-recommends && \
 #   rm -rf /var/lib/apt/lists/*
 
-RUN npm install -g npm
 COPY package* .
 
 RUN npm ci --silent
