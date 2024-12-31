@@ -65,7 +65,7 @@ rssRouter.get(
 
 rssRouter.get(
   '/all',
-  async (req, res) => {
+  async (_req, res) => {
     const data = await service.listAll()
     return res.send(data).end()
   }
@@ -76,7 +76,7 @@ rssRouter.get(
 
 rssRouter.get(
   '/amount',
-  async (req, res) => {
+  async (_req, res) => {
     const data = await service.count()
     return res.send(data).end()
   }

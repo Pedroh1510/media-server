@@ -26,7 +26,7 @@ export default class AnimeToshoService {
         },
       })
       .then((response) => response.data)
-      .catch((e) => {
+      .catch(() => {
         return null
       })
   }
@@ -70,7 +70,7 @@ export default class AnimeToshoService {
       const link = this.torrentService.infoHashToMagnet(item['nyaa:infoHash'])
       try {
         await this.torrentService.magnetInfo(link)
-      } catch (error) {
+      } catch {
         continue
       }
       yield {

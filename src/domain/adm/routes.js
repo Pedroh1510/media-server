@@ -72,7 +72,7 @@ admRouter.post(
 
 admRouter.get(
   '/tags',
-  async (req, res) => {
+  async (_req, res) => {
     const data = await admService.listTags()
     res.send(data)
   }

@@ -79,7 +79,7 @@ export default class NyaaService {
       const link = this.torrentService.infoHashToMagnet(item['nyaa:infoHash'])
       try {
         await this.torrentService.magnetInfo(link)
-      } catch (error) {
+      } catch {
         return null
       }
 
@@ -140,7 +140,7 @@ export default class NyaaService {
         }
       }
       return false
-    } catch (error) {
+    } catch {
       return false
     }
   }

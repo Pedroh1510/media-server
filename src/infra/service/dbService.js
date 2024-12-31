@@ -13,7 +13,7 @@ export default class DbService {
       try {
         await prisma.$connect()
         break
-      } catch { }
+      } catch {}
     }
   }
 }

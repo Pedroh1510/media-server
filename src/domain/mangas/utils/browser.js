@@ -71,7 +71,7 @@ export default class Browser {
     try {
       await this.page.click(selector)
       return true
-    } catch (error) {
+    } catch {
       return false
     }
   }

@@ -48,7 +48,7 @@ export default class RssService {
           id: await this.torrentService.magnetInfo(item.magnet),
           title: this.#formatTitle(item),
         })
-      } catch (error) {
+      } catch {
         // logger.error(`list item => ${JSON.stringify(item)}`)
       }
     }
@@ -82,7 +82,7 @@ export default class RssService {
           id: await this.torrentService.magnetInfo(item.magnet),
           title: this.#formatTitle(item),
         })
-      } catch (error) {
+      } catch {
         // logger.error(`list item => ${JSON.stringify(item)}`)
       }
     }

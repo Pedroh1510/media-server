@@ -26,7 +26,7 @@ export default class ExtractorService {
         await this.torrentService.magnetInfo(item.link)
         await this.repository.save(item)
         counter++
-      } catch (error) { }
+      } catch {}
     }
     return counter
   }
