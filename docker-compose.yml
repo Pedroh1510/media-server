@@ -5,8 +5,8 @@ services:
     # build: .
     container_name: rss
     command: npm run server
-    ports:
-      - 4000:4000
+    # ports:
+    #   - 4000:4000
     environment:
       - port=4000
       - host=rss.${DOMAIN}
