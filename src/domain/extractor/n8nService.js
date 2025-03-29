@@ -1,10 +1,13 @@
+import CONFIG from '../../infra/config.js'
 import { n8nApi } from '../../infra/service/apiService.js'
 
 export default class N8nService {
+  disable = !CONFIG.n8nUrl
   /**
    * @returns {AsyncGenerator<{title: string, link: string, date: Date}>}
    */
   async *extractor() {
+    if (this.disable) return
     const response = await n8nApi.get('/darkmaou-ultimos-series-novos-eps').then((response) => response.data)
 
     if (!Array.isArray(response)) return
@@ -23,6 +26,7 @@ export default class N8nService {
   }
 
   async listSeries() {
+    if (this.disable) return []
     const response = await n8nApi.get('/darkmaou-list-series').then((response) => response.data)
 
     return response ?? []
@@ -32,6 +36,7 @@ export default class N8nService {
    * @returns {AsyncGenerator<{title: string, link: string, date: Date}>}
    */
   async *listEps({ name, link }) {
+    if (this.disable) return
     const response = await n8nApi.post('/darkmaou-list-eps', { name, link }).then((response) => response.data)
 
     if (!Array.isArray(response)) return
