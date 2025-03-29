@@ -43,17 +43,19 @@ services:
     # build: .
     container_name: rss-jobs
     command: npm run job
-    environment:
-      - port=4000
-      - host=rss.${DOMAIN}
-      - TZ=${TZ}
-      - DATABASE_URL=postgresql://${DB_USER}:${DB_PASS}@${DB_HOST}:5432/${DB_SCHEMA}
-      - user_torrent=${TORRENT_USER}
-      - pass_torrent=${TORRENT_PASS}
-      - url_torrent=${TORRENT_URL}
-      - REDIS_HOST=${REDIS_HOST}
-      - REDIS_PORT=${REDIS_PORT}
-      - ERAI=${ERAI}
+    env_file:
+      - stack.env
+    # environment:
+    #   - port=4000
+    #   - host=rss.${DOMAIN}
+    #   - TZ=${TZ}
+    #   - DATABASE_URL=postgresql://${DB_USER}:${DB_PASS}@${DB_HOST}:5432/${DB_SCHEMA}
+    #   - user_torrent=${TORRENT_USER}
+    #   - pass_torrent=${TORRENT_PASS}
+    #   - url_torrent=${TORRENT_URL}
+    #   - REDIS_HOST=${REDIS_HOST}
+    #   - REDIS_PORT=${REDIS_PORT}
+    #   - ERAI=${ERAI}
     volumes:
       - ${DATA}/rss/db:/app/prisma/
       - ${DATA}/rss/downloads:/app/downloads
