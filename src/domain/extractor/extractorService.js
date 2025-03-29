@@ -4,6 +4,7 @@ import AnimeToshoService from './animeToshoService.js'
 import EraiService from './eraiService.js'
 import ExtractorRepository from './extractorRepository.js'
 import MoeService from './moeService.js'
+import N8nService from './n8nService.js'
 import NyaaService from './nyaaService.js'
 
 export default class ExtractorService {
@@ -14,6 +15,7 @@ export default class ExtractorService {
     this.animeToshoService = new AnimeToshoService()
     this.eraiService = new EraiService()
     this.torrentService = new TorrentService()
+    this.n8nService = new N8nService()
   }
 
   /**
@@ -72,6 +74,7 @@ export default class ExtractorService {
     const responses = await Promise.all([
       this.#executeExtractor(() => this.nyaaService.extractor(query, scanAllItems)),
       this.#executeExtractor(() => this.animeToshoService.extractor(query)),
+      this.#executeExtractor(() => this.n8nService.extractor()),
     ])
     logger.info(`extractorRss -> end ${responses.reduce((p, c) => p + c, 0)}`)
   }
@@ -81,11 +84,38 @@ export default class ExtractorService {
       nyaa: (param) => this.nyaaService.extractor(param, true),
       tosho: () => this.animeToshoService.extractor(),
       erai: () => this.eraiService.extractor(),
+      n8n: () => this.n8nService.extractor(),
     }
     if (!Object.keys(fromTo).includes(site) || typeof fromTo[site] !== 'function') {
       throw new Error('Site not supported or invalid method')
     }
     const responses = await Promise.all([this.#executeExtractor(() => fromTo[site](filters))])
+
+    return responses.reduce((p, c) => p + c, 0)
+  }
+
+  async listSeries(site) {
+    const fromTo = {
+      n8n: () => this.n8nService.listSeries(),
+    }
+    if (!Object.keys(fromTo).includes(site) || typeof fromTo[site] !== 'function') {
+      throw new Error('Site not supported or invalid method')
+    }
+
+    return fromTo[site]()
+  }
+
+  async scanEps({ link, name, site }) {
+    const fromTo = {
+      n8n: () => this.n8nService.listEps({ link, name }),
+    }
+
+    if (!Object.keys(fromTo).includes(site) || typeof fromTo[site] !== 'function') {
+      throw new Error('Site not supported or invalid method')
+    }
+
+    const responses = await Promise.all([this.#executeExtractor(() => fromTo[site]())])
+
     return responses.reduce((p, c) => p + c, 0)
   }
 }

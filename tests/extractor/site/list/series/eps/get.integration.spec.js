@@ -1,6 +1,6 @@
 import { beforeAll, beforeEach, describe, expect, test } from 'vitest'
 
-import orchestrator from '../orchestrator.js'
+import orchestrator from '../../../../../orchestrator.js'
 
 beforeAll(async () => {
   await orchestrator.waitForAllServices()
@@ -12,19 +12,15 @@ beforeEach(async () => {
   await orchestrator.seedDatabase()
 })
 
-describe('Extractor', () => {
+describe('get /extractor/:site/list/series/eps', () => {
   describe('by site', () => {
-    test('nyaa', async () => {
-      const response = await orchestrator.api.get('/extractor/nyaa', {
+    test('n8n', async () => {
+      const response = await orchestrator.api.get('/extractor/n8n/list/series/eps', {
         params: {
-          q: 'Kekkon Surutte, Hontou Desuka',
+          link: 'https://darkmahou.org/solo-leveling/',
+          name: 'Solo Leveling',
         },
       })
-      expect(response.status).toEqual(200)
-      expect(response.data).toEqual({ total: 25 })
-    })
-    test.only('n8n', async () => {
-      const response = await orchestrator.api.get('/extractor/n8n')
       expect(response.status).toEqual(200)
 
       expect(response.data.total).to.above(0)

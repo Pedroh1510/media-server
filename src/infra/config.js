@@ -9,6 +9,7 @@ const CONFIG = {
   redis_port: process.env.REDIS_PORT || '6379',
   erai: process.env.ERAI,
   dbUrl: process.env.DATABASE_URL,
+  n8nUrl: process.env.N8N_URL,
 }
 
 export default CONFIG
