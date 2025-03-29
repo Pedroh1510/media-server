@@ -44,7 +44,7 @@ services:
     container_name: rss-jobs
     command: npm run job
     env_file:
-      - rss.env
+      - stack.env
     # environment:
     #   - port=4000
     #   - host=rss.${DOMAIN}
