@@ -43,4 +43,41 @@ extractorRouter.get(
    * #swagger.tags = ["Extractor"]
    */
 )
+
+extractorRouter.get(
+  '/:site/list/series',
+  async (req, res) => {
+    req.setTimeout(0)
+    const series = await extractorService.listSeries(req.params.site)
+    res.send(series)
+  }
+  /**
+   * #swagger.tags = ["Extractor"]
+   * #swagger.path = '/extractor/{site}/list/series'
+   */
+)
+
+extractorRouter.get(
+  '/:site/list/series/eps',
+  async (req, res) => {
+    req.setTimeout(0)
+    const series = await extractorService.scanEps({ ...req.query, ...req.params })
+
+    res.status(200).json({ total: series })
+  }
+  /**
+   * #swagger.tags = ["Extractor"]
+   * #swagger.path = '/extractor/{site}/list/series/eps'
+#swagger.parameters['name'] = {
+  in: 'query',
+  type: 'string',
+  required:true
+}
+#swagger.parameters['link'] = {
+  in: 'query',
+  type: 'string',
+  required:true
+}
+   */
+)
 export default extractorRouter

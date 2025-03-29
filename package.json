@@ -18,7 +18,8 @@
     "migration:push": "npx dotenv -e .env.development -- npx prisma db push",
     "autogen": "node src/infra/swagger/autogen.js",
     "server": "npm run autogen && node src/server.js",
-    "serverDev": "node --env-file=.env.development src/server.js",
+    "serverDev": "npm run autogen && node --env-file=.env.development  src/server.js",
+    "serverDocker": "nodemon --inspect src/server.js",
     "job": "node src/jobsServer.js",
     "dev": "node --env-file=.env.development src/infra/swagger/autogen.js && (node --env-file=.env.development src/server.js & node --env-file=.env.development src/jobsServer.js)",
     "start": "npm run autogen && (npm run server & npm run job)"
@@ -26,6 +27,14 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "nodemonConfig": {
+    "verbose": true,
+    "ignore": [
+      "**/*test*",
+      "**/*spec*",
+      "vite.config.js.timestamp*"
+    ]
+  },
   "dependencies": {
     "@bull-board/api": "^6.5.4",
     "@bull-board/express": "^6.5.4",
@@ -58,6 +67,7 @@
   },
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
+    "@types/node": "^22.13.14",
     "concurrently": "^9.1.1",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
@@ -67,6 +77,7 @@
     "eslint-plugin-n": "^16.6.2",
     "eslint-plugin-prettier": "^5.1.3",
     "eslint-plugin-promise": "^6.1.1",
+    "nodemon": "^3.1.9",
     "prettier": "^3.2.5",
     "prisma": "^6.1.0",
     "swagger-autogen": "^2.23.7",

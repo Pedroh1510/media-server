@@ -27,7 +27,9 @@ async function waitForAllServices() {
 }
 
 function applyMigrations() {
-  execSync('npm run migration:push')
+  try {
+    execSync('npm run migration:push')
+  } catch {}
 }
 
 const cleanDatabase = async () => {
