@@ -1,5 +1,6 @@
 import { beforeAll, beforeEach, describe, expect, test } from 'vitest'
 
+import N8nService from '../../../../../src/domain/extractor/n8nService.js'
 import orchestrator from '../../../../orchestrator.js'
 
 beforeAll(async () => {
@@ -18,7 +19,9 @@ describe('GET /extractor/:site/list/series', () => {
       const response = await orchestrator.api.get('/extractor/n8n/list/series')
       expect(response.status).toEqual(200)
 
-      expect(response.data).to.have.length.above(0)
+      if (!new N8nService().disable) {
+        expect(response.data).to.have.length.above(0)
+      }
     })
   })
 })

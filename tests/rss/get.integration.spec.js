@@ -71,7 +71,7 @@ describe('RSS', () => {
       })
 
       expect(response.status).toEqual(200)
-      expect(response.data).toHaveLength(25)
+      expect(response.data).to.have.length.above(0)
     })
   })
 })

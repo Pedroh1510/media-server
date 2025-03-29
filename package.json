@@ -18,7 +18,8 @@
     "migration:push": "npx dotenv -e .env.development -- npx prisma db push",
     "autogen": "node src/infra/swagger/autogen.js",
     "server": "npm run autogen && node src/server.js",
-    "serverDev": "nodemon --inspect src/server.js",
+    "serverDev": "npm run autogen && node --env-file=.env.development  src/server.js",
+    "serverDocker": "nodemon --inspect src/server.js",
     "job": "node src/jobsServer.js",
     "dev": "node --env-file=.env.development src/infra/swagger/autogen.js && (node --env-file=.env.development src/server.js & node --env-file=.env.development src/jobsServer.js)",
     "start": "npm run autogen && (npm run server & npm run job)"
