@@ -8,7 +8,10 @@ export default class N8nService {
    */
   async *extractor() {
     if (this.disable) return
-    const response = await n8nApi.get('/darkmaou-ultimos-series-novos-eps').then((response) => response.data)
+    const response = await n8nApi
+      .get('/darkmaou-ultimos-series-novos-eps')
+      .then((response) => response.data)
+      .catch(() => null)
 
     if (!Array.isArray(response)) return
     for (const item of response) {
