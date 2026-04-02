@@ -9,5 +9,6 @@ import { ScanTtlRepository } from '../extractor/repository/scan-ttl.repository';
   imports: [BittorrentModule],
   controllers: [AdmController],
   providers: [AdmService, AdmRepository, ScanTtlRepository],
+  exports: [AdmService],
 })
 export class AdmModule {}

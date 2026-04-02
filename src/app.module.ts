@@ -11,7 +11,7 @@ import { JobsModule } from './jobs/jobs.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({ isGlobal: true }),
+    ConfigModule.forRoot({ isGlobal: true, envFilePath: ['.env.local', '.env.development', '.env'] }),
     BullModule.forRoot({
       connection: {
         host: process.env.REDIS_HOST || '127.0.0.1',
