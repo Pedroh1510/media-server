@@ -19,7 +19,9 @@ const config: Config = {
       testEnvironment: 'node',
       testMatch: ['<rootDir>/tests/**/*.spec.ts'],
       testTimeout: 60000,
-      transform: { '^.+\\.ts$': 'ts-jest' },
+      transform: {
+        '^.+\\.ts$': ['ts-jest', { tsconfig: 'tsconfig.test.json' }],
+      },
       moduleFileExtensions: ['ts', 'js', 'json'],
     },
   ],
