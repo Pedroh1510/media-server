@@ -64,12 +64,15 @@ describe('AdmController (integration)', () => {
   })
 
   describe('POST /adm/import-data', () => {
-    it('retorna 200 com { totalInserted: 0 }', async () => {
+    it('retorna 201 com { totalInserted: 0 }', async () => {
       await request(app.getHttpServer())
         .post('/adm/import-data')
         .send('')
         .expect(201)
         .expect({ totalInserted: 0 })
+      expect(mockAdmService.importData).toHaveBeenCalledWith(
+        expect.objectContaining({ fileStream: expect.anything() }),
+      )
     })
   })
 
