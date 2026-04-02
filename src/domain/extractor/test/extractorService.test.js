@@ -96,4 +96,56 @@ describe('ExtractorService', () => {
       expect(nyaaService.extractor).toHaveBeenCalled()
     })
   })
+
+  describe('scanFull', () => {
+    it('should call moe extractor and moe extractorAll', async () => {
+      const { service, moeService, nyaaService, animeToshoService, eraiService } = sut()
+      await service.scanFull()
+      expect(moeService.extractor).toHaveBeenCalled()
+      expect(moeService.extractorAll).toHaveBeenCalled()
+      expect(nyaaService.extractor).toHaveBeenCalledWith(undefined, true)
+      expect(animeToshoService.extractor).toHaveBeenCalled()
+      expect(eraiService.extractor).toHaveBeenCalled()
+    })
+
+    it('should return total count of saved items', async () => {
+      const item = makeItem()
+      const { service, moeService } = sut()
+      moeService.extractor.mockImplementation(makeAsyncGen(item))
+      const total = await service.scanFull()
+      expect(typeof total).toBe('number')
+      expect(total).toBeGreaterThanOrEqual(1)
+    })
+  })
+
+  describe('listSeries', () => {
+    it('should return series from n8n site', async () => {
+      const { service, n8nService } = sut()
+      n8nService.listSeries.mockResolvedValue([{ name: 'Naruto', link: 'http://n8n/naruto' }])
+      const result = await service.listSeries('n8n')
+      expect(result).toEqual([{ name: 'Naruto', link: 'http://n8n/naruto' }])
+    })
+
+    it('should throw for unsupported site', async () => {
+      const { service } = sut()
+      await expect(service.listSeries('unknown')).rejects.toThrow('Site not supported')
+    })
+  })
+
+  describe('scanEps', () => {
+    it('should throw for unsupported site', async () => {
+      const { service } = sut()
+      await expect(service.scanEps({ link: 'http://x', name: 'Naruto', site: 'unknown' })).rejects.toThrow(
+        'Site not supported'
+      )
+    })
+
+    it('should call n8n listEps for site=n8n', async () => {
+      const item = makeItem()
+      const { service, n8nService } = sut()
+      n8nService.listEps.mockImplementation(makeAsyncGen(item))
+      const total = await service.scanEps({ link: 'http://n8n/naruto', name: 'Naruto', site: 'n8n' })
+      expect(typeof total).toBe('number')
+    })
+  })
 })

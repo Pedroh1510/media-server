@@ -8,4 +8,8 @@ export default class ScanTtlRepositoryInMemory {
   async setLastScan(term) {
     this.#store.set(term, new Date().toISOString())
   }
+
+  async clearAll() {
+    this.#store.clear()
+  }
 }

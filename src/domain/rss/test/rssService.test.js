@@ -72,7 +72,7 @@ describe('rssService', () => {
     it('should call enqueueScan with cleaned term when isScan is true', async () => {
       const { service, scanJobService } = sut()
       await service.list({ t: 'One Piece S01', isScan: true })
-      expect(scanJobService.enqueueScan).toHaveBeenCalledWith('One Piece')
+      expect(scanJobService.enqueueScan).toHaveBeenCalledWith('One Piece', { scanAllItems: false })
     })
 
     it('should not call enqueueScan when isScan is false', async () => {
@@ -93,7 +93,7 @@ describe('rssService', () => {
     it('should call enqueueScan when isScan is true', async () => {
       const { service, scanJobService } = sut()
       await service.listAsXml({ t: 'Naruto', isScan: true })
-      expect(scanJobService.enqueueScan).toHaveBeenCalledWith('Naruto')
+      expect(scanJobService.enqueueScan).toHaveBeenCalledWith('Naruto', { scanAllItems: false })
     })
 
     it('should return xml output', async () => {
