@@ -8,18 +8,13 @@ export class RssRepository {
   async list({ term, limit }: { term?: string; limit?: number }) {
     return this.prisma.torrent.findMany({
       take: limit,
-      where: {
-        title: { contains: term?.split(/s\d/).pop().trim() ?? undefined, mode: 'insensitive' },
-      },
+      where: term ? { title: { contains: term.split(/s\d/).pop().trim(), mode: 'insensitive' } } : undefined,
       orderBy: { pubDate: 'desc' },
     })
   }
 
   async listAll() {
-    return this.prisma.torrent.findMany({
-      take: 100,
-      orderBy: { pubDate: 'desc' },
-    })
+    return this.prisma.torrent.findMany({ take: 100, orderBy: { pubDate: 'desc' } })
   }
 
   async count() {

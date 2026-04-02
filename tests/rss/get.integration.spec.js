@@ -61,4 +61,13 @@ describe('RSS', () => {
       expect(response.data).toHaveLength(0)
     })
   })
+
+  describe('list json', () => {
+    test('list Kekkon Surutte, Hontou Desuka', async () => {
+      const response = await orchestrator.api.get('rss')
+
+      expect(response.status).toEqual(200)
+      expect(response.data).toHaveLength(0)
+    })
+  })
 })
