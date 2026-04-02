@@ -1,14 +1,7 @@
 node_modules
-Dockerfile
-.dockerignore
-docker-compose.yml
-.vscode
+dist
 .env*
 downloads
+.vscode
 .github
-dist
-!src
-!prisma
-!package.json
-!package-lock.json
-!vite.config.js
+docker-compose.yml

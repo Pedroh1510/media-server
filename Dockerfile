@@ -1,15 +1,29 @@
-FROM node:20-alpine AS runner
+FROM node:20-alpine AS builder
 WORKDIR /app
-# RUN npm install -g npm
 
-COPY package* .
-
+COPY package*.json ./
 RUN npm ci --silent
+
 COPY prisma ./prisma/
 RUN npx prisma generate
-COPY . .
 
-ENV port=3333
+COPY . .
+RUN npm run build
+
+# ---
+
+FROM node:20-alpine AS runner
+WORKDIR /app
+
+COPY package*.json ./
+RUN npm ci --omit=dev --silent
+
+COPY prisma ./prisma/
+RUN npx prisma generate
+
+COPY --from=builder /app/dist ./dist
+
+ENV PORT=3333
 EXPOSE 3333
-RUN npm run autogen
-CMD [ "npm","run","server" ]
+
+CMD ["node", "dist/main"]

@@ -1,25 +1,11 @@
 services:
   rss:
     image: pedroh1510/rss:latest
-    # image:
-    # build: .
+    build: .
     container_name: rss
     command: npm run server
-    # ports:
-    #   - 4000:4000
     env_file:
       - stack.env
-    # environment:
-    #   - port=4000
-    #   - host=rss.${DOMAIN}
-    #   - TZ=${TZ}
-    #   - DATABASE_URL=postgresql://${DB_USER}:${DB_PASS}@${DB_HOST}:5432/${DB_SCHEMA}
-    #   - user_torrent=${TORRENT_USER}
-    #   - pass_torrent=${TORRENT_PASS}
-    #   - url_torrent=${TORRENT_URL}
-    #   - REDIS_HOST=${REDIS_HOST}
-    #   - REDIS_PORT=${REDIS_PORT}
-    #   - ERAI=${ERAI}
     volumes:
       - ${DATA}/rss/db:/app/prisma/
       - ${DATA}/rss/downloads:/app/downloads
@@ -32,6 +18,7 @@ services:
       - proxy
       - database
       - cache
+      - torrent
     labels:
       - traefik.enable=true
       - traefik.http.routers.rss-router.rule=Host(`rss.${DOMAIN}`)
@@ -39,37 +26,6 @@ services:
       - traefik.http.routers.rss-router.tls=true
       - traefik.http.services.rss-router.loadbalancer.server.port=4000
       - traefik.docker.network=proxy
-
-  rss-jobs:
-    image: pedroh1510/rss:latest
-    # build: .
-    container_name: rss-jobs
-    command: npm run job
-    env_file:
-      - stack.env
-    # environment:
-    #   - port=4000
-    #   - host=rss.${DOMAIN}
-    #   - TZ=${TZ}
-    #   - DATABASE_URL=postgresql://${DB_USER}:${DB_PASS}@${DB_HOST}:5432/${DB_SCHEMA}
-    #   - user_torrent=${TORRENT_USER}
-    #   - pass_torrent=${TORRENT_PASS}
-    #   - url_torrent=${TORRENT_URL}
-    #   - REDIS_HOST=${REDIS_HOST}
-    #   - REDIS_PORT=${REDIS_PORT}
-    #   - ERAI=${ERAI}
-    volumes:
-      - ${DATA}/rss/db:/app/prisma/
-      - ${DATA}/rss/downloads:/app/downloads
-    restart: unless-stopped
-    deploy:
-      resources:
-        limits:
-          cpus: '0.5'
-    networks:
-      - database
-      - cache
-      - torrent
 
 networks:
   proxy:
