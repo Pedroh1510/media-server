@@ -6,7 +6,7 @@ export default async function scanJob({ data }) {
   const { term, scanAllItems } = data
   const extractorService = new ExtractorService()
   logger.info(`startCron scanJob term=${term} scanAllItems=${scanAllItems}`)
-  await extractorService.extractorRss({ q: term, scanAllItems }).catch((error) => {
+  await extractorService.extractorRss({ q: term }, scanAllItems).catch((error) => {
     logger.warn(`scanJob error: ${error.message}`)
   })
   await DbService.connection.$disconnect()

@@ -76,7 +76,20 @@ admRouter.get(
     const data = await admService.listTags()
     res.send(data)
   }
-  /* #swagger.tags = ["ADM"] */
+  /* #swagger.tags = ["ADM"] 
+  #swagger.path = '/adm/tags'
+  */
+)
+
+admRouter.post(
+  '/cache-clean',
+  asyncWrapper(async (_req, res) => {
+    await admService.clearScanCache()
+    res.status(202).end()
+  })
+  /* #swagger.tags = ["ADM"] 
+  #swagger.path = '/adm/cache-clean'
+  */
 )
 
 export default admRouter

@@ -19,4 +19,9 @@ export default class ScanTtlRepository {
     const ttlSeconds = CONFIG.scanTtlMinutes * 60
     await this.#redis.set(`scan:ttl:${term}`, new Date().toISOString(), 'EX', ttlSeconds)
   }
+
+  async clearAll() {
+    const keys = await this.#redis.keys('scan:ttl:*')
+    if (keys.length) await this.#redis.del(keys)
+  }
 }

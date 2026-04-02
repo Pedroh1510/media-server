@@ -4,6 +4,7 @@ import { pipeline } from 'node:stream/promises'
 import BittorrentService from '../../infra/service/bittorrentService.js'
 import DateFormatter from '../../utils/dateFormatter.js'
 import logger from '../../utils/logger.js'
+import ScanTtlRepository from '../extractor/repository/scanTtlRepository.js'
 import CsvService from '../shared/csvService.js'
 import AdmRepository from './repository/admRepository.js'
 
@@ -15,11 +16,13 @@ export default class AdmService {
     },
     repository = {
       repository: new AdmRepository(),
+      scanTtlRepository: new ScanTtlRepository(),
     }
   ) {
     this.csvService = service.csvService
     this.bittorrentService = service.bittorrentService
     this.repository = repository.repository
+    this.scanTtlRepository = repository.scanTtlRepository
   }
 
   async deleteFiles() {
@@ -115,5 +118,9 @@ export default class AdmService {
       verifyTags: await this.repository.listVerifyTags(),
       acceptedTags: await this.repository.listAcceptedTags(),
     }
+  }
+
+  async clearScanCache() {
+    await this.scanTtlRepository.clearAll()
   }
 }
