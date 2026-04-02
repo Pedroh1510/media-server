@@ -171,7 +171,7 @@ export class MoeService {
             data.title = child.children[0]?.data;
             uriToPageItem = child.attribs.href;
           } else if (regexHour.test(child?.data)) {
-            data.hour = regexHour.exec(child.data)![0].replace('|', '').trim();
+            data.hour = regexHour.exec(child.data)![0].replaceAll('|', '').trim();
           }
         }
         if (!data.link || !data.title || !data.hour) return null;

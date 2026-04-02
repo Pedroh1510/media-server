@@ -74,8 +74,9 @@ export class ExtractorService {
       erai: () => this.eraiService.extractor(),
       n8n: () => this.n8nService.extractor(),
     };
-    if (!fromTo[site]) throw new Error('Site not supported or invalid method');
-    return this.executeExtractor(() => fromTo[site]());
+    const extractor = fromTo[site];
+    if (!extractor) throw new Error('Site not supported or invalid method');
+    return this.executeExtractor(() => extractor());
   }
 
   async listSeries(site: string) {
