@@ -1,4 +1,8 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
+
+vi.mock('axios', () => ({
+  default: vi.fn().mockResolvedValue(null),
+}))
 
 import TorrentService from '../torrentService.js'
 
@@ -22,6 +26,12 @@ describe('torrentService', () => {
       const { service } = sut()
       const infoHash = await service.magnetInfo('magnet:?xt=urn:btih:1234567890123456789012345678901234567890')
       expect(infoHash).toEqual({ infoHash: '1234567890123456789012345678901234567890' })
+    })
+  })
+  describe('magnetByLinkFile', () => {
+    it('should throw when http request fails', async () => {
+      const { service } = sut()
+      await expect(service.magnetByLinkFile('http://example.com/file.torrent')).rejects.toThrow('Error downloading torrent')
     })
   })
 })

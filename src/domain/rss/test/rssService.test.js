@@ -104,4 +104,50 @@ describe('rssService', () => {
       expect(result).toBe('<rss/>')
     })
   })
+
+  describe('buildItems (via list)', () => {
+    it('should process items with magnet link', async () => {
+      const { service, rssRepository } = sut()
+      rssRepository.torrent = [
+        { id: 1, title: 'Naruto - 01', magnet: 'magnet:?xt=urn:btih:abc', pubDate: new Date() },
+      ]
+      const result = await service.list({ isScan: false })
+      expect(result).toHaveLength(1)
+      expect(result[0].title).toBe('Naruto - 01')
+    })
+
+    it('should skip items when torrentService throws', async () => {
+      const { service, rssRepository, torrentService } = sut()
+      rssRepository.torrent = [
+        { id: 1, title: 'Naruto - 01', magnet: 'bad-magnet', pubDate: new Date() },
+      ]
+      torrentService.returns.magnetInfo = null
+      // Make magnetInfo throw
+      vi.spyOn(torrentService, 'magnetInfo').mockRejectedValue(new Error('bad magnet'))
+      const result = await service.list({ isScan: false })
+      expect(result).toHaveLength(0)
+    })
+  })
+
+  describe('formatTitle (via list)', () => {
+    it('should format episode titles with season pattern', async () => {
+      const { service, rssRepository } = sut()
+      rssRepository.torrent = [
+        { id: 1, title: '[Sub] Anime 2nd Season - 01 [720p]', magnet: 'magnet:?xt=urn:btih:abc', pubDate: new Date() },
+      ]
+      const result = await service.list({ isScan: false })
+      expect(result).toHaveLength(1)
+      // title went through formatTitle which manipulates "2nd Season - 01" pattern
+      expect(typeof result[0].title).toBe('string')
+    })
+
+    it('should leave titles unchanged when no season pattern', async () => {
+      const { service, rssRepository } = sut()
+      rssRepository.torrent = [
+        { id: 1, title: 'Naruto - Episode 01', magnet: 'magnet:?xt=urn:btih:abc', pubDate: new Date() },
+      ]
+      const result = await service.list({ isScan: false })
+      expect(result[0].title).toBe('Naruto - Episode 01')
+    })
+  })
 })

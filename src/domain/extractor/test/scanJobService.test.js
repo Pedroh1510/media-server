@@ -22,7 +22,7 @@ describe('ScanJobService', () => {
       expect(queue.add).toHaveBeenCalledOnce()
       expect(queue.add).toHaveBeenCalledWith(
         'scan',
-        { term: 'One Piece' },
+        { term: 'One Piece', scanAllItems: false },
         expect.objectContaining({ jobId: 'scan:One Piece', removeOnComplete: true })
       )
     })
