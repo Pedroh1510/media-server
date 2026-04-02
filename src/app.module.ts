@@ -7,6 +7,7 @@ import { ExtractorModule } from './domain/extractor/extractor.module';
 import { SharedModule } from './domain/shared/shared.module';
 import { RssModule } from './domain/rss/rss.module';
 import { AdmModule } from './domain/adm/adm.module';
+import { JobsModule } from './jobs/jobs.module';
 
 @Module({
   imports: [
@@ -23,6 +24,7 @@ import { AdmModule } from './domain/adm/adm.module';
     ExtractorModule,
     RssModule,
     AdmModule,
+    JobsModule,
   ],
 })
 export class AppModule {}

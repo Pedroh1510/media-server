@@ -2,16 +2,17 @@ import 'reflect-metadata';
 import { NestFactory } from '@nestjs/core';
 import { ValidationPipe } from '@nestjs/common';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
+import { createBullBoard } from '@bull-board/api';
+import { BullMQAdapter } from '@bull-board/api/bullMQAdapter';
+import { ExpressAdapter } from '@bull-board/express';
+import { Queue } from 'bullmq';
 import { AppModule } from './app.module';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
 
   app.enableCors({ origin: '*' });
-
-  app.useGlobalPipes(
-    new ValidationPipe({ transform: true, whitelist: true }),
-  );
+  app.useGlobalPipes(new ValidationPipe({ transform: true, whitelist: true }));
 
   const swaggerConfig = new DocumentBuilder()
     .setTitle('Media Server API')
@@ -19,6 +20,23 @@ async function bootstrap() {
     .build();
   const document = SwaggerModule.createDocument(app, swaggerConfig);
   SwaggerModule.setup('docs', app, document);
+
+  // BullBoard
+  const connection = {
+    host: process.env.REDIS_HOST || '127.0.0.1',
+    port: parseInt(process.env.REDIS_PORT || '6379'),
+  };
+  const boardAdapter = new ExpressAdapter();
+  boardAdapter.setBasePath('/queues');
+  createBullBoard({
+    queues: [
+      new BullMQAdapter(new Queue('Anime process', { connection })),
+      new BullMQAdapter(new Queue('Adm Anime', { connection })),
+      new BullMQAdapter(new Queue('Scan process', { connection })),
+    ],
+    serverAdapter: boardAdapter,
+  });
+  app.use('/queues', boardAdapter.getRouter());
 
   const port = process.env.port || 3033;
   await app.listen(port);
