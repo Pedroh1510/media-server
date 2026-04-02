@@ -1,32 +1,32 @@
-import { Test, TestingModule } from '@nestjs/testing';
-import { ConfigService } from '@nestjs/config';
-import { RssService } from './rss.service';
-import { RssRepository } from './rss.repository';
-import { XmlService } from '../shared/xml.service';
-import { TorrentService } from '../shared/torrent.service';
-import { ScanJobService } from '../extractor/scan-job.service';
+import { Test, TestingModule } from '@nestjs/testing'
+import { ConfigService } from '@nestjs/config'
+import { RssService } from './rss.service'
+import { RssRepository } from './rss.repository'
+import { XmlService } from '../shared/xml.service'
+import { TorrentService } from '../shared/torrent.service'
+import { ScanJobService } from '../extractor/scan-job.service'
 
 const makeRssRepo = () => ({
   list: jest.fn().mockResolvedValue([]),
   listAll: jest.fn().mockResolvedValue([]),
   count: jest.fn().mockResolvedValue(0),
-});
+})
 
 const makeScanJobService = () => ({
   enqueueScan: jest.fn().mockResolvedValue(undefined),
-});
+})
 
 const makeXmlService = () => ({
   buildToRss: jest.fn().mockReturnValue('<rss/>'),
-});
+})
 
 const makeTorrentService = () => ({
   magnetInfo: jest.fn().mockResolvedValue('hash123'),
-});
+})
 
 const makeConfigService = () => ({
   get: jest.fn().mockImplementation((_key: string, def: any) => def),
-});
+})
 
 const buildModule = async (overrides: Record<string, any> = {}) => {
   const module: TestingModule = await Test.createTestingModule({
@@ -38,59 +38,59 @@ const buildModule = async (overrides: Record<string, any> = {}) => {
       { provide: ScanJobService, useValue: overrides.scanJobService ?? makeScanJobService() },
       { provide: ConfigService, useValue: overrides.configService ?? makeConfigService() },
     ],
-  }).compile();
+  }).compile()
 
   return {
     service: module.get(RssService),
     repository: module.get(RssRepository) as jest.Mocked<RssRepository>,
     scanJobService: module.get(ScanJobService) as jest.Mocked<ScanJobService>,
     xmlService: module.get(XmlService) as jest.Mocked<XmlService>,
-  };
-};
+  }
+}
 
 describe('RssService', () => {
   describe('count', () => {
     it('should return total from repository', async () => {
-      const { service, repository } = await buildModule();
-      (repository.count as jest.Mock).mockResolvedValue(42);
-      await expect(service.count()).resolves.toEqual({ total: 42 });
-    });
-  });
+      const { service, repository } = await buildModule()
+      ;(repository.count as jest.Mock).mockResolvedValue(42)
+      await expect(service.count()).resolves.toEqual({ total: 42 })
+    })
+  })
 
   describe('listAll', () => {
     it('should delegate to repository.listAll', async () => {
-      const { service, repository } = await buildModule();
-      (repository.listAll as jest.Mock).mockResolvedValue([{ id: 1 }]);
-      await expect(service.listAll()).resolves.toEqual([{ id: 1 }]);
-    });
-  });
+      const { service, repository } = await buildModule()
+      ;(repository.listAll as jest.Mock).mockResolvedValue([{ id: 1 }])
+      await expect(service.listAll()).resolves.toEqual([{ id: 1 }])
+    })
+  })
 
   describe('list', () => {
     it('should call enqueueScan when isScan is true', async () => {
-      const { service, scanJobService } = await buildModule();
-      await service.list({ t: 'One Piece S01', isScan: 'true' });
-      expect(scanJobService.enqueueScan).toHaveBeenCalledWith('One Piece', { scanAllItems: false });
-    });
+      const { service, scanJobService } = await buildModule()
+      await service.list({ term: 'One Piece S01', isScan: 'true' })
+      expect(scanJobService.enqueueScan).toHaveBeenCalledWith('One Piece', { scanAllItems: false })
+    })
 
     it('should not call enqueueScan when isScan is false', async () => {
-      const { service, scanJobService } = await buildModule();
-      await service.list({ t: 'One Piece', isScan: false });
-      expect(scanJobService.enqueueScan).not.toHaveBeenCalled();
-    });
+      const { service, scanJobService } = await buildModule()
+      await service.list({ term: 'One Piece', isScan: false })
+      expect(scanJobService.enqueueScan).not.toHaveBeenCalled()
+    })
 
     it('should return empty array when repository returns empty', async () => {
-      const { service } = await buildModule();
-      const result = await service.list({ isScan: false });
-      expect(result).toEqual([]);
-    });
-  });
+      const { service } = await buildModule()
+      const result = await service.list({ isScan: false })
+      expect(result).toEqual([])
+    })
+  })
 
   describe('listAsXml', () => {
     it('should return xml string from xmlService', async () => {
-      const { service, xmlService } = await buildModule();
-      (xmlService.buildToRss as jest.Mock).mockReturnValue('<rss><item/></rss>');
-      const result = await service.listAsXml({ isScan: false });
-      expect(result).toBe('<rss><item/></rss>');
-    });
-  });
-});
+      const { service, xmlService } = await buildModule()
+      ;(xmlService.buildToRss as jest.Mock).mockReturnValue('<rss><item/></rss>')
+      const result = await service.listAsXml({ isScan: false })
+      expect(result).toBe('<rss><item/></rss>')
+    })
+  })
+})
