@@ -23,7 +23,8 @@
     "job": "node src/jobsServer.js",
     "jobDev": "node --env-file=.env.development src/jobsServer.js",
     "dev": "node --env-file=.env.development src/infra/swagger/autogen.js && concurrently -n server,job -k -s command-server \"npm run serverDev\" \"npm run jobDev\"",
-    "start": "npm run autogen && (npm run server & npm run job)"
+    "start": "npm run autogen && (npm run server & npm run job)",
+    "docker:push": "docker buildx build --push -t pedroh1510/rss:latest ."
   },
   "keywords": [],
   "author": "",
@@ -59,9 +60,6 @@
     "lodash": "^4.17.21",
     "morgan": "^1.10.0",
     "parse-torrent": "^11.0.17",
-    "puppeteer": "^23.11.1",
-    "puppeteer-extra": "^3.3.6",
-    "puppeteer-extra-plugin-stealth": "^2.11.2",
     "qbittorrent-api-v2": "^1.2.2",
     "winston": "^3.17.0",
     "winston-loki": "^6.1.3"
