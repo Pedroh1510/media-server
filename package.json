@@ -7,8 +7,6 @@
     "services:up": "docker compose -f src/infra/docker/compose.yml up -d",
     "services:down": "docker compose -f src/infra/docker/compose.yml down",
     "lint": "eslint . --fix",
-    "lint:biome": "npx @biomejs/biome check ./src",
-    "lint:biome:fix": "npx @biomejs/biome check --fix ./src",
     "migration:push": "npx dotenv -e .env.development -- npx prisma db push",
     "docker:push": "docker buildx build --push -t pedroh1510/rss:latest .",
     "test:nest": "jest --config jest.config.ts",
@@ -55,7 +53,6 @@
     "winston-loki": "^6.1.3"
   },
   "devDependencies": {
-    "@biomejs/biome": "1.9.4",
     "@nestjs/cli": "^11.0.17",
     "@nestjs/testing": "^11.1.17",
     "@types/async-retry": "^1.4.9",

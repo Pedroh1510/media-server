@@ -167,3 +167,5 @@ dist
 *.db
 mangasMain
 src/infra/swagger/swagger-output.json
+.claude
+docs

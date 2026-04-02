@@ -33,9 +33,8 @@ describe('RSS', () => {
       })
 
       expect(response.status).toEqual(200)
-      expect(
-        response.data
-      ).toEqual(`<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:nyaa="https://nyaa.si/xmlns/nyaa" version="2.0">
+      expect(response.data)
+        .toEqual(`<rss xmlns:atom="http://www.w3.org/2005/Atom" xmlns:nyaa="https://nyaa.si/xmlns/nyaa" version="2.0">
   <channel>
     <title>Nyaa - Home - Torrent File RSS</title>
     <description>RSS Feed for Home</description>
