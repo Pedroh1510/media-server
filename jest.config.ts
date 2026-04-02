@@ -9,6 +9,9 @@ const config: Config = {
       testMatch: ['<rootDir>/src/**/*.spec.ts'],
       transform: { '^.+\\.ts$': 'ts-jest' },
       moduleFileExtensions: ['ts', 'js', 'json'],
+      moduleNameMapper: {
+        '^parse-torrent$': '<rootDir>/src/__mocks__/parse-torrent.js',
+      },
     },
     {
       displayName: 'integration',
