@@ -11,6 +11,7 @@
     "docker:push": "docker buildx build --push -t pedroh1510/rss:latest .",
     "test:nest": "jest --config jest.config.ts",
     "test:nest:coverage": "jest --config jest.config.ts --coverage",
+    "test:ci": "jest --config jest.config.ts --selectProjects unit --runInBand",
     "build": "nest build",
     "start:prod": "node dist/main",
     "start:dev": "nest start --watch"
