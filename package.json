@@ -21,7 +21,8 @@
     "serverDev": "npm run autogen && node --env-file=.env.development  src/server.js",
     "serverDocker": "nodemon --inspect src/server.js",
     "job": "node src/jobsServer.js",
-    "dev": "node --env-file=.env.development src/infra/swagger/autogen.js && (node --env-file=.env.development src/server.js & node --env-file=.env.development src/jobsServer.js)",
+    "jobDev": "node --env-file=.env.development src/jobsServer.js",
+    "dev": "node --env-file=.env.development src/infra/swagger/autogen.js && concurrently -n server,job -k -s command-server \"npm run serverDev\" \"npm run jobDev\"",
     "start": "npm run autogen && (npm run server & npm run job)"
   },
   "keywords": [],
@@ -68,7 +69,7 @@
   "devDependencies": {
     "@biomejs/biome": "1.9.4",
     "@types/node": "^22.13.14",
-    "concurrently": "^9.1.1",
+    "concurrently": "^9.2.1",
     "eslint": "^8.56.0",
     "eslint-config-prettier": "^9.1.0",
     "eslint-config-standard": "^17.1.0",

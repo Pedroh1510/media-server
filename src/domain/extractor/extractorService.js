@@ -8,14 +8,22 @@ import N8nService from './n8nService.js'
 import NyaaService from './nyaaService.js'
 
 export default class ExtractorService {
-  constructor() {
-    this.repository = new ExtractorRepository()
-    this.moeService = new MoeService()
-    this.nyaaService = new NyaaService()
-    this.animeToshoService = new AnimeToshoService()
-    this.eraiService = new EraiService()
-    this.torrentService = new TorrentService()
-    this.n8nService = new N8nService()
+  constructor({
+    repository = new ExtractorRepository(),
+    moeService = new MoeService(),
+    nyaaService = new NyaaService(),
+    animeToshoService = new AnimeToshoService(),
+    eraiService = new EraiService(),
+    torrentService = new TorrentService(),
+    n8nService = new N8nService(),
+  } = {}) {
+    this.repository = repository
+    this.moeService = moeService
+    this.nyaaService = nyaaService
+    this.animeToshoService = animeToshoService
+    this.eraiService = eraiService
+    this.torrentService = torrentService
+    this.n8nService = n8nService
   }
 
   /**
@@ -28,7 +36,9 @@ export default class ExtractorService {
         await this.torrentService.magnetInfo(item.link)
         await this.repository.save(item)
         counter++
-      } catch {}
+      } catch (error) {
+        logger.warn(`executeExtractor error: ${error?.message ?? error}`)
+      }
     }
     return counter
   }

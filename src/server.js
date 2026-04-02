@@ -5,7 +5,6 @@ import morgan from 'morgan'
 
 import admRouter from './domain/adm/routes.js'
 import extractorRouter from './domain/extractor/routes.js'
-import mangasRouter from './domain/mangas/routes.js'
 import rssRouter from './domain/rss/routes.js'
 import statusRouter from './domain/status/routes.js'
 import CONFIG from './infra/config.js'
@@ -29,9 +28,7 @@ server.use(
     origin: '*',
   })
 )
-server.use(express.static('dist'))
 server.use('/docs', SwaggerDoc.middleware(), SwaggerDoc.doc())
-server.use('/mangas', mangasRouter)
 
 server.use('/rss', rssRouter)
 

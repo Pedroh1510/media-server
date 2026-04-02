@@ -61,17 +61,5 @@ describe('RSS', () => {
       expect(response.status).toEqual(200)
       expect(response.data).toHaveLength(0)
     })
-    test('list Kekkon Surutte, Hontou Desuka, scanAllItems = true', async () => {
-      const response = await orchestrator.api.get('rss/json', {
-        params: {
-          term: 'Kekkon Surutte, Hontou Desuka',
-          scanAllItems: true,
-          isScan: true,
-        },
-      })
-
-      expect(response.status).toEqual(200)
-      expect(response.data).to.have.length.above(0)
-    })
   })
 })

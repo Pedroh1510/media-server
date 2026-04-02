@@ -10,6 +10,7 @@ const CONFIG = {
   erai: process.env.ERAI,
   dbUrl: process.env.DATABASE_URL,
   n8nUrl: process.env.N8N_URL,
+  scanTtlMinutes: parseInt(process.env.SCAN_TTL_MINUTES) || 15,
 }
 
 export default CONFIG

@@ -1,26 +1,17 @@
-import path from 'node:path'
 import { createBullBoard } from '@bull-board/api'
 import { BullMQAdapter } from '@bull-board/api/bullMQAdapter.js'
 import { ExpressAdapter } from '@bull-board/express'
 import { Queue, Worker } from 'bullmq'
+import path from 'node:path'
 
 import CONFIG from './infra/config.js'
 import logger from './utils/logger.js'
 
 const connection = { host: CONFIG.redis_host, port: CONFIG.redis_port }
-const configJob = {
-  attempts: 4,
-  removeOnComplete: { age: 60, count: 500 },
-  removeOnFail: { age: 3600 },
-}
 
-export const mangaQueue = new Queue('Manga process', {
-  connection,
-  defaultJobOptions: configJob,
-})
-export const admMangaQueue = new Queue('Adm Manga', { connection, defaultJobOptions: configJob })
 export const animeQueue = new Queue('Anime process', { connection })
 export const admAnimeQueue = new Queue('Adm Anime', { connection })
+export const scanQueue = new Queue('Scan process', { connection })
 
 export default class QueueService {
   workers = {}
@@ -28,16 +19,6 @@ export default class QueueService {
     logger.info('Start jobs')
     const workersJobsPath = path.resolve('src', 'jobs')
     this.workers = {
-      processItemCatalogMangaAdm: new Worker(
-        admMangaQueue.name,
-        path.resolve(workersJobsPath, 'processItemCatalogMangaAdmJob.js'),
-        { concurrency: 4, connection, useWorkerThreads: true }
-      ),
-      queueManga: new Worker(mangaQueue.name, path.resolve(workersJobsPath, 'queueMangaJob.js'), {
-        concurrency: 1,
-        connection,
-        useWorkerThreads: true,
-      }),
       animeQueue: new Worker(animeQueue.name, path.resolve(workersJobsPath, 'animeQueueJob.js'), {
         concurrency: 1,
         connection,
@@ -45,6 +26,11 @@ export default class QueueService {
       }),
       admAnimeQueue: new Worker(admAnimeQueue.name, path.resolve(workersJobsPath, 'admAnimeQueueJob.js'), {
         concurrency: 1,
+        connection,
+        useWorkerThreads: true,
+      }),
+      scanQueue: new Worker(scanQueue.name, path.resolve(workersJobsPath, 'scanJob.js'), {
+        concurrency: 2,
         connection,
         useWorkerThreads: true,
       }),
@@ -65,12 +51,7 @@ export default class QueueService {
 
 const serverAdapter = new ExpressAdapter()
 createBullBoard({
-  queues: [
-    new BullMQAdapter(mangaQueue),
-    new BullMQAdapter(admMangaQueue),
-    new BullMQAdapter(animeQueue),
-    new BullMQAdapter(admAnimeQueue),
-  ],
+  queues: [new BullMQAdapter(animeQueue), new BullMQAdapter(admAnimeQueue), new BullMQAdapter(scanQueue)],
   serverAdapter,
 })
 

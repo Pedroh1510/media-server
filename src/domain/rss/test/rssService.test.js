@@ -1,27 +1,30 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 
-import CsvServiceMock from '../../shared/mock/csvServiceMock.js'
 import TorrentServiceMock from '../../shared/mock/torrentServiceMock.js'
 import XmlServiceMock from '../../shared/mock/xmlServiceMock.js'
 import RssRepositoryInMemory from '../repository/rssRepositoryInMemory.js'
 import RssService from '../rssService.js'
 
+const makeScanJobServiceMock = () => ({
+  enqueueScan: vi.fn().mockResolvedValue(undefined),
+})
+
 const sut = () => {
   const xmlService = new XmlServiceMock()
-  const csvService = new CsvServiceMock()
   const torrentService = new TorrentServiceMock()
+  const scanJobService = makeScanJobServiceMock()
   const rssRepository = new RssRepositoryInMemory()
   const service = new RssService(
     {
       xmlService,
-      csvService,
       torrentService,
+      scanJobService,
     },
     {
       rssRepository,
     }
   )
-  return { service, xmlService, csvService, torrentService, rssRepository }
+  return { service, xmlService, torrentService, scanJobService, rssRepository }
 }
 
 describe('rssService', () => {
@@ -62,6 +65,43 @@ describe('rssService', () => {
         },
       ]
       await expect(service.count()).resolves.toEqual({ total: rssRepository.torrent.length })
+    })
+  })
+
+  describe('list', () => {
+    it('should call enqueueScan with cleaned term when isScan is true', async () => {
+      const { service, scanJobService } = sut()
+      await service.list({ t: 'One Piece S01', isScan: true })
+      expect(scanJobService.enqueueScan).toHaveBeenCalledWith('One Piece')
+    })
+
+    it('should not call enqueueScan when isScan is false', async () => {
+      const { service, scanJobService } = sut()
+      await service.list({ t: 'One Piece', isScan: false })
+      expect(scanJobService.enqueueScan).not.toHaveBeenCalled()
+    })
+
+    it('should return items from repository', async () => {
+      const { service, rssRepository } = sut()
+      rssRepository.torrent = []
+      const result = await service.list({ t: 'test', isScan: false })
+      expect(result).toEqual([])
+    })
+  })
+
+  describe('listAsXml', () => {
+    it('should call enqueueScan when isScan is true', async () => {
+      const { service, scanJobService } = sut()
+      await service.listAsXml({ t: 'Naruto', isScan: true })
+      expect(scanJobService.enqueueScan).toHaveBeenCalledWith('Naruto')
+    })
+
+    it('should return xml output', async () => {
+      const { service, rssRepository, xmlService } = sut()
+      rssRepository.torrent = []
+      vi.spyOn(xmlService, 'buildToRss').mockReturnValue('<rss/>')
+      const result = await service.listAsXml({ t: 'test', isScan: false })
+      expect(result).toBe('<rss/>')
     })
   })
 })

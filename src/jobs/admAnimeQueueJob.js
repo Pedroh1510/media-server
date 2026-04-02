@@ -2,8 +2,7 @@ import AdmService from '../domain/adm/admService.js'
 import DbService from '../infra/service/dbService.js'
 import logger from '../utils/logger.js'
 
-export default async function admAnimeQueueJob() {
-  const admService = new AdmService()
+export default async function admAnimeQueueJob({ admService = new AdmService() } = {}) {
   const process = async () => {
     logger.info('startCron admAnimeQueueJob')
     await admService.deleteFiles().catch((error) => {

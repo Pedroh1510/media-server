@@ -1,6 +1,6 @@
 import CONFIG from '../../infra/config.js'
 import logger from '../../utils/logger.js'
-import ExtractorService from '../extractor/extractorService.js'
+import ScanJobService from '../extractor/scanJobService.js'
 import TorrentService from '../shared/torrentService.js'
 import XmlService from '../shared/xmlService.js'
 import RssRepository from './repository/rssRepository.js'
@@ -10,7 +10,7 @@ export default class RssService {
     services = {
       xmlService: new XmlService(),
       torrentService: new TorrentService(),
-      extractorService: new ExtractorService(),
+      scanJobService: new ScanJobService(),
     },
     repositories = {
       rssRepository: new RssRepository(),
@@ -18,7 +18,7 @@ export default class RssService {
   ) {
     this.xmlService = services.xmlService
     this.torrentService = services.torrentService
-    this.extractorService = services.extractorService
+    this.scanJobService = services.scanJobService
     this.repository = repositories.rssRepository
   }
 
@@ -30,7 +30,7 @@ export default class RssService {
     }
     logger.info(`List -> with term ${term} -- ${JSON.stringify(data ?? {})}`)
     if (isScan === 'true' || isScan === true) {
-      await this.extractorService.extractorRss({ q: term }, !!scanAllItems)
+      await this.scanJobService.enqueueScan(term, { scanAllItems: scanAllItems === 'true' || scanAllItems === true })
     }
 
     const response = await this.repository.list({
@@ -38,22 +38,7 @@ export default class RssService {
       limit: term ? undefined : 100,
     })
 
-    const items = []
-
-    for (const item of response) {
-      try {
-        items.push({
-          ...item,
-          page: `http://192.168.0.19:${CONFIG.port}}/${item.id}`,
-          id: await this.torrentService.magnetInfo(item.magnet),
-          title: this.#formatTitle(item),
-        })
-      } catch {
-        // logger.error(`list item => ${JSON.stringify(item)}`)
-      }
-    }
-
-    return items
+    return this.#buildItems(response)
   }
 
   async listAsXml(data) {
@@ -64,7 +49,7 @@ export default class RssService {
     }
     logger.info(`List -> with term ${term} -- ${JSON.stringify(data ?? {})}`)
     if (isScan === 'true' || isScan === true) {
-      await this.extractorService.extractorRss({ q: term }, !!scanAllItems)
+      await this.scanJobService.enqueueScan(term, { scanAllItems: scanAllItems === 'true' || scanAllItems === true })
     }
 
     const response = await this.repository.list({
@@ -72,21 +57,7 @@ export default class RssService {
       limit: term ? undefined : 100,
     })
 
-    const items = []
-
-    for (const item of response) {
-      try {
-        items.push({
-          ...item,
-          page: `http://192.168.0.19:${CONFIG.port}}/${item.id}`,
-          id: await this.torrentService.magnetInfo(item.magnet),
-          title: this.#formatTitle(item),
-        })
-      } catch {
-        // logger.error(`list item => ${JSON.stringify(item)}`)
-      }
-    }
-
+    const items = await this.#buildItems(response)
     return this.xmlService.buildToRss({ items })
   }
 
@@ -96,6 +67,23 @@ export default class RssService {
 
   async count() {
     return { total: await this.repository.count() }
+  }
+
+  async #buildItems(response) {
+    const items = []
+    for (const item of response) {
+      try {
+        items.push({
+          ...item,
+          page: `http://${CONFIG.host}:${CONFIG.port}/${item.id}`,
+          id: await this.torrentService.magnetInfo(item.magnet),
+          title: this.#formatTitle(item),
+        })
+      } catch (error) {
+        logger.warn(`buildItems item error: ${error?.message ?? error}`)
+      }
+    }
+    return items
   }
 
   /**
