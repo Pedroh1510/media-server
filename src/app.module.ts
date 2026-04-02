@@ -6,6 +6,7 @@ import { StatusModule } from './domain/status/status.module';
 import { ExtractorModule } from './domain/extractor/extractor.module';
 import { SharedModule } from './domain/shared/shared.module';
 import { RssModule } from './domain/rss/rss.module';
+import { AdmModule } from './domain/adm/adm.module';
 
 @Module({
   imports: [
@@ -21,6 +22,7 @@ import { RssModule } from './domain/rss/rss.module';
     StatusModule,
     ExtractorModule,
     RssModule,
+    AdmModule,
   ],
 })
 export class AppModule {}
