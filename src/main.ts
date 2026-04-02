@@ -16,7 +16,11 @@ async function bootstrap() {
 
   const swaggerConfig = new DocumentBuilder().setTitle('Media Server API').setVersion('1.0').build()
   const document = SwaggerModule.createDocument(app, swaggerConfig)
-  SwaggerModule.setup('ds', app, document)
+  SwaggerModule.setup('docs', app, document,{
+    swaggerOptions: {
+      docExpansion: 'none', 
+    }
+  })
 
   // BullBoard
   const connection = {
