@@ -9,9 +9,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Setup Biome
-        uses: biomejs/setup-biome@v2
+      - uses: actions/setup-node@v4
         with:
-          version: latest
-      - name: Run Biome
-        run: biome ci ./src
+          node-version: "lts/Iron"
+      - run: npm ci
+      - name: Lint
+        run: npm run test:ci

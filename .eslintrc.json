@@ -5,7 +5,20 @@
     },
     "ignorePatterns": [
         "node_modules",
-        "frontend"
+        "frontend",
+        "dist",
+        "src/server.js",
+        "src/jobsServer.js",
+        "src/infra/swagger",
+        "tests/**/*.integration.spec.js"
+    ],
+    "overrides": [
+        {
+            "files": ["src/__mocks__/**/*.js"],
+            "env": {
+                "jest": true
+            }
+        }
     ],
     "extends": [
         "standard",
