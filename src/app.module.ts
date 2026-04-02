@@ -4,6 +4,7 @@ import { BullModule } from '@nestjs/bullmq';
 import { DatabaseModule } from './infra/database/database.module';
 import { StatusModule } from './domain/status/status.module';
 import { ExtractorModule } from './domain/extractor/extractor.module';
+import { SharedModule } from './domain/shared/shared.module';
 
 @Module({
   imports: [
@@ -15,6 +16,7 @@ import { ExtractorModule } from './domain/extractor/extractor.module';
       },
     }),
     DatabaseModule,
+    SharedModule,
     StatusModule,
     ExtractorModule,
   ],
