@@ -4,8 +4,13 @@ import { INestApplication } from '@nestjs/common'
 import { StatusController } from '../src/domain/status/status.controller'
 import { StatusService } from '../src/domain/status/status.service'
 
+const mockStatusResult = {
+  database: { version: '16.0', maxConnections: 100, activeConnections: 5 },
+  qbittorrent: { version: '5.0.0', apiVersion: '2.9' },
+}
+
 const mockStatusService = {
-  getStatus: jest.fn().mockResolvedValue(undefined),
+  getStatus: jest.fn().mockResolvedValue(mockStatusResult),
 }
 
 describe('StatusController (integration)', () => {
@@ -25,10 +30,21 @@ describe('StatusController (integration)', () => {
 
   beforeEach(() => jest.clearAllMocks())
 
-  it('GET /status → 200 com { message: "Status" }', async () => {
+  it('GET /status → 200 com dados de database e qbittorrent', async () => {
+    mockStatusService.getStatus.mockResolvedValue(mockStatusResult)
     await request(app.getHttpServer())
       .get('/status')
       .expect(200)
-      .expect({ message: 'Status' })
+      .expect(mockStatusResult)
+  })
+
+  it('GET /status → 400 quando database retorna erro', async () => {
+    mockStatusService.getStatus.mockResolvedValue({
+      database: { error: 'connection refused' },
+      qbittorrent: { version: '5.0.0', apiVersion: '2.9' },
+    })
+    await request(app.getHttpServer())
+      .get('/status')
+      .expect(400)
   })
 })

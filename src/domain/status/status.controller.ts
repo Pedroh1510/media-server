@@ -1,4 +1,4 @@
-import { Controller, Get } from '@nestjs/common';
+import { BadRequestException, Controller, Get } from '@nestjs/common';
 import { ApiTags } from '@nestjs/swagger';
 import { StatusService } from './status.service';
 
@@ -9,7 +9,12 @@ export class StatusController {
 
   @Get()
   async getStatus() {
-    await this.statusService.getStatus();
-    return { message: 'Status' };
+    const status = await this.statusService.getStatus();
+
+    if ('error' in status.database) {
+      throw new BadRequestException(status);
+    }
+
+    return status;
   }
 }
