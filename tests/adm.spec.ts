@@ -1,7 +1,7 @@
 import request from 'supertest'
 import { Readable } from 'node:stream'
 import { Test } from '@nestjs/testing'
-import { INestApplication } from '@nestjs/common'
+import { BadRequestException, INestApplication } from '@nestjs/common'
 import { AdmController } from '../src/domain/adm/adm.controller'
 import { AdmService } from '../src/domain/adm/adm.service'
 
@@ -157,7 +157,6 @@ describe('AdmController (integration)', () => {
     })
 
     it('retorna 400 quando o serviço falha', async () => {
-      const { BadRequestException } = await import('@nestjs/common')
       mockAdmService.stopTorrent.mockRejectedValue(new BadRequestException('connection refused'))
       await request(app.getHttpServer())
         .patch('/adm/torrents/abc123/stop')
@@ -175,7 +174,6 @@ describe('AdmController (integration)', () => {
     })
 
     it('retorna 400 quando o serviço falha', async () => {
-      const { BadRequestException } = await import('@nestjs/common')
       mockAdmService.deleteTorrent.mockRejectedValue(new BadRequestException('not found'))
       await request(app.getHttpServer())
         .delete('/adm/torrents/abc123')

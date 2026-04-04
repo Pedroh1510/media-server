@@ -74,12 +74,14 @@ export class AdmController {
   }
 
   @Patch('torrents/:hash/stop')
-  async stopTorrent(@Param('hash') hash: string) {
+  async stopTorrent(@Param('hash') hash: string, @Res() res: Response) {
     await this.admService.stopTorrent(hash)
+    res.status(200).end()
   }
 
   @Delete('torrents/:hash')
-  async deleteTorrent(@Param('hash') hash: string) {
+  async deleteTorrent(@Param('hash') hash: string, @Res() res: Response) {
     await this.admService.deleteTorrent(hash)
+    res.status(200).end()
   }
 }
