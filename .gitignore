@@ -170,3 +170,5 @@ mangasMain
 src/infra/swagger/swagger-output.json
 .claude
 docs
+src/infra/docker/data
+src/infra/docker/media

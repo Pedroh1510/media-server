@@ -11,6 +11,7 @@ const config: Config = {
       moduleFileExtensions: ['ts', 'js', 'json'],
       moduleNameMapper: {
         '^parse-torrent$': '<rootDir>/src/__mocks__/parse-torrent.js',
+        '^@ctrl/qbittorrent$': '<rootDir>/src/__mocks__/@ctrl/qbittorrent.js',
       },
     },
     {

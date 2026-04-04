@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Post, Req, Res } from '@nestjs/common';
+import { Body, Controller, Delete, Get, Param, Patch, Post, Req, Res } from '@nestjs/common';
 import { ApiBody, ApiTags } from '@nestjs/swagger';
 import { Request, Response } from 'express';
 import { AdmService } from './adm.service';
@@ -57,5 +57,31 @@ export class AdmController {
   async clearScanCache(@Res() res: Response) {
     await this.admService.clearScanCache();
     res.status(202).end();
+  }
+
+  @Get('torrents/concluded')
+  async listConcludedTorrents(@Res() res: Response) {
+    const list = await this.admService.listConcludedTorrents()
+    if (!list.length) return res.status(204).end()
+    return res.json(list)
+  }
+
+  @Get('torrents')
+  async listTorrents(@Res() res: Response) {
+    const list = await this.admService.listTorrents()
+    if (!list.length) return res.status(204).end()
+    return res.json(list)
+  }
+
+  @Patch('torrents/:hash/stop')
+  async stopTorrent(@Param('hash') hash: string, @Res() res: Response) {
+    await this.admService.stopTorrent(hash)
+    res.status(200).end()
+  }
+
+  @Delete('torrents/:hash')
+  async deleteTorrent(@Param('hash') hash: string, @Res() res: Response) {
+    await this.admService.deleteTorrent(hash)
+    res.status(200).end()
   }
 }
