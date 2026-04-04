@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { PassThrough, Readable, Writable } from 'node:stream';
 import { pipeline } from 'node:stream/promises';
 import { BittorrentService } from '../../infra/service/bittorrent.service';
@@ -92,5 +92,25 @@ export class AdmService {
 
   async clearScanCache() {
     await this.scanTtlRepository.clearAll();
+  }
+
+  async listTorrents() {
+    return this.bittorrentService.listTorrents()
+  }
+
+  async listConcludedTorrents() {
+    return this.bittorrentService.listTorrentsConcluded()
+  }
+
+  async stopTorrent(hash: string): Promise<void> {
+    await this.bittorrentService.stopTorrents(hash).catch((e: any) => {
+      throw new BadRequestException(e.message)
+    })
+  }
+
+  async deleteTorrent(hash: string): Promise<void> {
+    await this.bittorrentService.deleteTorrents([hash]).catch((e: any) => {
+      throw new BadRequestException(e.message)
+    })
   }
 }

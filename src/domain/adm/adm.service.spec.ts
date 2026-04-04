@@ -16,6 +16,7 @@ const makeAdmRepo = () => ({
 });
 
 const makeBittorrentService = () => ({
+  listTorrents: jest.fn().mockResolvedValue([]),
   listTorrentsConcluded: jest.fn().mockResolvedValue([]),
   stopTorrents: jest.fn().mockResolvedValue(undefined),
   deleteTorrents: jest.fn().mockResolvedValue(undefined),
@@ -111,4 +112,56 @@ describe('AdmService', () => {
       expect(scanTtlRepository.clearAll).toHaveBeenCalled();
     });
   });
+
+  describe('listTorrents', () => {
+    it('retorna lista do bittorrentService', async () => {
+      const torrent = { hash: 'abc', name: 'A', availability: 1, state: 'seeding', progress: 1, dateCompleted: new Date() }
+      const { service, bittorrentService } = await buildModule()
+      bittorrentService.listTorrents.mockResolvedValue([torrent])
+      await expect(service.listTorrents()).resolves.toEqual([torrent])
+    })
+  })
+
+  describe('listConcludedTorrents', () => {
+    it('retorna lista do bittorrentService', async () => {
+      const torrent = { hash: 'abc', name: 'A', availability: 1, state: 'seeding', progress: 1, dateCompleted: new Date() }
+      const { service, bittorrentService } = await buildModule()
+      bittorrentService.listTorrentsConcluded.mockResolvedValue([torrent])
+      await expect(service.listConcludedTorrents()).resolves.toEqual([torrent])
+    })
+  })
+
+  describe('stopTorrent', () => {
+    it('chama bittorrentService.stopTorrents com o hash', async () => {
+      const { service, bittorrentService } = await buildModule()
+      await service.stopTorrent('abc123')
+      expect(bittorrentService.stopTorrents).toHaveBeenCalledWith('abc123')
+    })
+
+    it('lança BadRequestException quando bittorrentService falha', async () => {
+      const { service, bittorrentService } = await buildModule()
+      bittorrentService.stopTorrents.mockRejectedValue(new Error('connection refused'))
+      await expect(service.stopTorrent('abc123')).rejects.toMatchObject({
+        message: 'connection refused',
+        status: 400,
+      })
+    })
+  })
+
+  describe('deleteTorrent', () => {
+    it('chama bittorrentService.deleteTorrents com array de um hash', async () => {
+      const { service, bittorrentService } = await buildModule()
+      await service.deleteTorrent('abc123')
+      expect(bittorrentService.deleteTorrents).toHaveBeenCalledWith(['abc123'])
+    })
+
+    it('lança BadRequestException quando bittorrentService falha', async () => {
+      const { service, bittorrentService } = await buildModule()
+      bittorrentService.deleteTorrents.mockRejectedValue(new Error('not found'))
+      await expect(service.deleteTorrent('abc123')).rejects.toMatchObject({
+        message: 'not found',
+        status: 400,
+      })
+    })
+  })
 });
