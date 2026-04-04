@@ -16,6 +16,10 @@ const mockAdmService = {
   listTags: jest.fn().mockResolvedValue({ acceptedTags: [], verifyTags: [] }),
   insertTags: jest.fn().mockResolvedValue(undefined),
   clearScanCache: jest.fn().mockResolvedValue(undefined),
+  listTorrents: jest.fn().mockResolvedValue([]),
+  listConcludedTorrents: jest.fn().mockResolvedValue([]),
+  stopTorrent: jest.fn().mockResolvedValue(undefined),
+  deleteTorrent: jest.fn().mockResolvedValue(undefined),
 }
 
 describe('AdmController (integration)', () => {
@@ -104,6 +108,78 @@ describe('AdmController (integration)', () => {
         .post('/adm/cache-clean')
         .expect(202)
       expect(mockAdmService.clearScanCache).toHaveBeenCalled()
+    })
+  })
+
+  describe('GET /adm/torrents/concluded', () => {
+    it('retorna 204 quando lista vazia', async () => {
+      mockAdmService.listConcludedTorrents.mockResolvedValue([])
+      await request(app.getHttpServer())
+        .get('/adm/torrents/concluded')
+        .expect(204)
+    })
+
+    it('retorna 200 com lista quando há torrents', async () => {
+      const torrent = { hash: 'abc', name: 'A', availability: 1, state: 'seeding', progress: 1, dateCompleted: new Date().toISOString() }
+      mockAdmService.listConcludedTorrents.mockResolvedValue([torrent])
+      await request(app.getHttpServer())
+        .get('/adm/torrents/concluded')
+        .expect(200)
+        .expect([torrent])
+    })
+  })
+
+  describe('GET /adm/torrents', () => {
+    it('retorna 204 quando lista vazia', async () => {
+      mockAdmService.listTorrents.mockResolvedValue([])
+      await request(app.getHttpServer())
+        .get('/adm/torrents')
+        .expect(204)
+    })
+
+    it('retorna 200 com lista quando há torrents', async () => {
+      const torrent = { hash: 'xyz', name: 'B', availability: 0.5, state: 'downloading', progress: 0.5, dateCompleted: new Date().toISOString() }
+      mockAdmService.listTorrents.mockResolvedValue([torrent])
+      await request(app.getHttpServer())
+        .get('/adm/torrents')
+        .expect(200)
+        .expect([torrent])
+    })
+  })
+
+  describe('PATCH /adm/torrents/:hash/stop', () => {
+    it('retorna 200 quando para o torrent com sucesso', async () => {
+      mockAdmService.stopTorrent.mockResolvedValue(undefined)
+      await request(app.getHttpServer())
+        .patch('/adm/torrents/abc123/stop')
+        .expect(200)
+      expect(mockAdmService.stopTorrent).toHaveBeenCalledWith('abc123')
+    })
+
+    it('retorna 400 quando o serviço falha', async () => {
+      const { BadRequestException } = await import('@nestjs/common')
+      mockAdmService.stopTorrent.mockRejectedValue(new BadRequestException('connection refused'))
+      await request(app.getHttpServer())
+        .patch('/adm/torrents/abc123/stop')
+        .expect(400)
+    })
+  })
+
+  describe('DELETE /adm/torrents/:hash', () => {
+    it('retorna 200 quando deleta o torrent com sucesso', async () => {
+      mockAdmService.deleteTorrent.mockResolvedValue(undefined)
+      await request(app.getHttpServer())
+        .delete('/adm/torrents/abc123')
+        .expect(200)
+      expect(mockAdmService.deleteTorrent).toHaveBeenCalledWith('abc123')
+    })
+
+    it('retorna 400 quando o serviço falha', async () => {
+      const { BadRequestException } = await import('@nestjs/common')
+      mockAdmService.deleteTorrent.mockRejectedValue(new BadRequestException('not found'))
+      await request(app.getHttpServer())
+        .delete('/adm/torrents/abc123')
+        .expect(400)
     })
   })
 })
