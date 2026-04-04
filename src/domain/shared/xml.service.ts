@@ -1,6 +1,7 @@
 import { Injectable } from '@nestjs/common';
 import { ConfigService } from '@nestjs/config';
-import { XMLBuilder, XMLParser } from 'fast-xml-parser';
+import XMLBuilder from 'fast-xml-builder';
+import { XMLParser } from 'fast-xml-parser';
 import { DateFormatter } from '../../utils/date-formatter';
 
 @Injectable()
