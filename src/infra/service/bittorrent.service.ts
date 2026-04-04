@@ -36,6 +36,12 @@ export class BittorrentService {
     }
   }
 
+  async getServerInfo() {
+    const apiVersion = await this.client.getApiVersion()
+    const appVersion = await this.client.getAppVersion()
+    return { apiVersion, appVersion }
+  }
+
   async listTorrents(): Promise<Torrent[]> {
     const data = await this.client.getAllData()
     return data.torrents.map((item: any) => this.mapTorrent(item))
