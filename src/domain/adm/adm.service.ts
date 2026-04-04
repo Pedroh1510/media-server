@@ -1,85 +1,85 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
-import { PassThrough, Readable, Writable } from 'node:stream';
-import { pipeline } from 'node:stream/promises';
-import { BittorrentService } from '../../infra/service/bittorrent.service';
-import { DateFormatter } from '../../utils/date-formatter';
-import { CsvService } from '../shared/csv.service';
-import { ScanTtlRepository } from '../extractor/repository/scan-ttl.repository';
-import { AdmRepository } from './adm.repository';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common'
+import { PassThrough, Readable, Writable } from 'node:stream'
+import { pipeline } from 'node:stream/promises'
+import { BittorrentService } from '../../infra/service/bittorrent.service'
+import { DateFormatter } from '../../utils/date-formatter'
+import { CsvService } from '../shared/csv.service'
+import { ScanTtlRepository } from '../extractor/repository/scan-ttl.repository'
+import { AdmRepository } from './adm.repository'
 
 @Injectable()
 export class AdmService {
-  private readonly logger = new Logger(AdmService.name);
+  private readonly logger = new Logger(AdmService.name)
 
   constructor(
     private readonly csvService: CsvService,
     private readonly bittorrentService: BittorrentService,
     private readonly repository: AdmRepository,
-    private readonly scanTtlRepository: ScanTtlRepository,
+    private readonly scanTtlRepository: ScanTtlRepository
   ) {}
 
   async deleteFiles() {
-    const listTorrents = await this.bittorrentService.listTorrentsConcluded();
-    this.logger.log(`Total de torrents concluidos ${listTorrents.length}`);
+    const listTorrents = await this.bittorrentService.listTorrentsConcluded()
+    this.logger.log(`Total de torrents concluidos ${listTorrents.length}`)
 
-    const stopped = [];
+    const stopped = []
     for (const torrent of listTorrents) {
-      await this.bittorrentService.stopTorrents(torrent.hash)
+      await this.bittorrentService
+        .stopTorrents(torrent.hash)
         .then(() => stopped.push(torrent))
-        .catch((e: any) => this.logger.error(`erro ao parar torrent ${torrent.name}: ${e.message}`));
+        .catch((e: any) => this.logger.error(`erro ao parar torrent ${torrent.name}: ${e.message}`))
     }
 
-    const maxHours = 2;
-    const expired = stopped.filter(
-      (item: any) => DateFormatter.diff(Date.now(), item.dateCompleted, 'hour') > maxHours,
-    );
+    const maxHours = 2
+    const expired = stopped.filter((item: any) => DateFormatter.diff(Date.now(), item.dateCompleted, 'hour') > maxHours)
 
-    if (!expired.length) return { total: stopped.length, totalDeleted: 0 };
+    if (!expired.length) return { total: stopped.length, totalDeleted: 0 }
 
-    await this.bittorrentService.deleteTorrents(expired.map((item: any) => item.hash));
+    await this.bittorrentService.deleteTorrents(expired.map((item: any) => item.hash))
     return {
       total: stopped.length,
       totalDeleted: expired.length,
-      deleled: expired.map(({ name }: { name: string }) => name),
-    };
+      deleted: expired.map(({ name }: { name: string }) => name),
+    }
   }
 
   exportData() {
-    const read = Readable.from(this.repository.listAll());
+    const read = Readable.from(this.repository.listAll())
     return {
       fileName: 'data.csv',
-      stream: read
-        .pipe(this.csvService.jsonToCsvStream({ objectMode: true }))
-        .pipe(new PassThrough()),
-    };
+      stream: read.pipe(this.csvService.jsonToCsvStream({ objectMode: true })).pipe(new PassThrough()),
+    }
   }
 
   async deleteRss() {
-    await this.repository.deleteAll();
+    await this.repository.deleteAll()
   }
 
   async importData({ fileStream }: { fileStream: NodeJS.ReadableStream }) {
-    let totalInserted = 0;
+    let totalInserted = 0
     await pipeline(
       fileStream as any,
       this.csvService.csvToJson(),
       new Writable({
         objectMode: true,
         write: async (chunk, _, cb) => {
-          await this.repository.insert(chunk).then(() => totalInserted++).catch(() => {});
-          cb(null);
+          await this.repository
+            .insert(chunk)
+            .then(() => totalInserted++)
+            .catch(() => {})
+          cb(null)
         },
-      }),
-    );
-    return { totalInserted };
+      })
+    )
+    return { totalInserted }
   }
 
   async insertTags({ acceptedTags, verifyTags }: { acceptedTags?: string[]; verifyTags?: string[] }) {
     if (acceptedTags?.length) {
-      await this.repository.insertAcceptedTags(acceptedTags.map((tag) => ({ tag }))).catch(() => {});
+      await this.repository.insertAcceptedTags(acceptedTags.map((tag) => ({ tag }))).catch(() => {})
     }
     if (verifyTags?.length) {
-      await this.repository.insertVerifyTags(verifyTags.map((tag) => ({ tag }))).catch(() => {});
+      await this.repository.insertVerifyTags(verifyTags.map((tag) => ({ tag }))).catch(() => {})
     }
   }
 
@@ -87,11 +87,11 @@ export class AdmService {
     return {
       verifyTags: await this.repository.listVerifyTags(),
       acceptedTags: await this.repository.listAcceptedTags(),
-    };
+    }
   }
 
   async clearScanCache() {
-    await this.scanTtlRepository.clearAll();
+    await this.scanTtlRepository.clearAll()
   }
 
   async listTorrents() {

@@ -8,6 +8,7 @@ export type Torrent = {
   availability: number
   state: string
   progress: number
+  isCompleted: boolean
   dateCompleted: Date
 }
 
@@ -25,12 +26,13 @@ export class BittorrentService {
 
   private mapTorrent(item: any): Torrent {
     return {
-      hash: item.hash,
+      hash: item.id,
       name: item.name,
       availability: item.availability,
       state: item.state,
       progress: item.progress,
-      dateCompleted: new Date(item.completion_on * 1000),
+      isCompleted: item.isCompleted,
+      dateCompleted: new Date(item.dateCompleted),
     }
   }
 
@@ -41,7 +43,7 @@ export class BittorrentService {
 
   async listTorrentsConcluded(): Promise<Torrent[]> {
     const list = await this.listTorrents()
-    return list.filter(({ dateCompleted }) => dateCompleted.getUTCFullYear() >= 2024)
+    return list.filter(({ isCompleted }) => isCompleted)
   }
 
   async deleteTorrents(listHashes: string[]): Promise<void> {
@@ -49,6 +51,10 @@ export class BittorrentService {
   }
 
   async stopTorrents(hash: string): Promise<void> {
-    await this.client.stopTorrent(hash)
+    try {
+      await this.client.stopTorrent(hash)
+    } catch (error) {
+      throw new Error(`Erro ao parar torrent com hash ${hash}: ${error.message}`, { cause: error })
+    }
   }
 }
