@@ -6,9 +6,10 @@ export class RssRepository {
   constructor(private readonly prisma: PrismaService) {}
 
   async list({ term, limit }: { term?: string; limit?: number }) {
+    const termWithoutSeason = term?.split(/s\d/).pop().trim()
     return this.prisma.torrent.findMany({
       take: limit,
-      where: term ? { title: { contains: term.split(/s\d/).pop().trim(), mode: 'insensitive' } } : undefined,
+      where: termWithoutSeason ? { title: { contains: termWithoutSeason, mode: 'insensitive' } } : undefined,
       orderBy: { pubDate: 'desc' },
     })
   }
