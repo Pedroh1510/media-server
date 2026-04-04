@@ -40,7 +40,7 @@ export class StatusService {
         activeConnections: Number(activeRow.count),
       };
     } catch (error) {
-      return { error: error.message };
+      return { error: error instanceof Error ? error.message : String(error) };
     }
   }
 
@@ -49,7 +49,7 @@ export class StatusService {
       const { appVersion, apiVersion } = await this.bittorrent.getServerInfo();
       return { version: appVersion, apiVersion };
     } catch (error) {
-      return { error: error.message };
+      return { error: error instanceof Error ? error.message : String(error) };
     }
   }
 }

@@ -37,8 +37,10 @@ export class BittorrentService {
   }
 
   async getServerInfo() {
-    const apiVersion = await this.client.getApiVersion()
-    const appVersion = await this.client.getAppVersion()
+    const [apiVersion, appVersion] = await Promise.all([
+      this.client.getApiVersion(),
+      this.client.getAppVersion(),
+    ])
     return { apiVersion, appVersion }
   }
 
@@ -60,7 +62,7 @@ export class BittorrentService {
     try {
       await this.client.stopTorrent(hash)
     } catch (error) {
-      throw new Error(`Erro ao parar torrent com hash ${hash}: ${error.message}`, { cause: error })
+      throw new Error(`Erro ao parar torrent com hash ${hash}: ${error instanceof Error ? error.message : String(error)}`, { cause: error })
     }
   }
 }
