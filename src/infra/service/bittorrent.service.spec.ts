@@ -14,10 +14,7 @@ jest.mock('@ctrl/qbittorrent', () => ({
 
 const buildModule = async () => {
   const module = await Test.createTestingModule({
-    providers: [
-      BittorrentService,
-      { provide: ConfigService, useValue: { get: jest.fn().mockReturnValue('mock') } },
-    ],
+    providers: [BittorrentService, { provide: ConfigService, useValue: { get: jest.fn().mockReturnValue('mock') } }],
   }).compile()
   return { service: module.get(BittorrentService) }
 }
@@ -27,12 +24,13 @@ describe('BittorrentService', () => {
     it('mapeia dados crus para o tipo Torrent', async () => {
       const { service } = await buildModule()
       const raw = {
-        hash: 'abc123',
+        id: 'abc123',
         name: 'Anime.S01E01',
         availability: 1,
         state: 'seeding',
         progress: 1,
-        completion_on: 1700000000,
+        isCompleted: true,
+        dateCompleted: new Date(1700000000 * 1000).toISOString(),
       }
       ;(service as any).client.getAllData = jest.fn().mockResolvedValue({ torrents: [raw] })
       const result = await service.listTorrents()
@@ -43,6 +41,7 @@ describe('BittorrentService', () => {
           availability: 1,
           state: 'seeding',
           progress: 1,
+          isCompleted: true,
           dateCompleted: new Date(1700000000 * 1000),
         },
       ])
@@ -50,10 +49,26 @@ describe('BittorrentService', () => {
   })
 
   describe('listTorrentsConcluded', () => {
-    it('retorna apenas torrents com dateCompleted >= 2024', async () => {
+    it('retorna apenas torrents concluídos', async () => {
       const { service } = await buildModule()
-      const old = { hash: 'old', name: 'Old', availability: 1, state: 'seeding', progress: 1, completion_on: 1609459200 } // 2021
-      const recent = { hash: 'new', name: 'New', availability: 1, state: 'seeding', progress: 1, completion_on: 1704067200 } // 2024
+      const old = {
+        id: 'old',
+        name: 'Old',
+        availability: 1,
+        state: 'seeding',
+        progress: 1,
+        isCompleted: false,
+        completion_on: 1609459200,
+      } // 2021
+      const recent = {
+        id: 'new',
+        name: 'New',
+        availability: 1,
+        state: 'seeding',
+        progress: 1,
+        isCompleted: true,
+        completion_on: 1704067200,
+      } // 2024
       ;(service as any).client.getAllData = jest.fn().mockResolvedValue({ torrents: [old, recent] })
       const result = await service.listTorrentsConcluded()
       expect(result).toHaveLength(1)
