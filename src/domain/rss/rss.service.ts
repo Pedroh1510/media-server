@@ -31,7 +31,11 @@ export class RssService {
     this.logger.log(`List -> with term ${term}`)
 
     if (term && (isScan === 'true' || isScan === true)) {
-      await this.scanJobService.enqueueScan(term, { scanAllItems: scanAllItems === 'true' || scanAllItems === true })
+      try {
+        await this.scanJobService.enqueueScan(term, { scanAllItems: scanAllItems === 'true' || scanAllItems === true })
+      } catch (error) {
+        this.logger.warn(`enqueueScan failed: ${(error as Error)?.message}`)
+      }
     }
 
     const response = await this.repository.list({ term, limit: term ? undefined : 100 })
