@@ -25,7 +25,7 @@ export class ScanJobService {
       'scan',
       { term, ...options },
       {
-        jobId: `scan-${term}`,
+        jobId: `scan-${term?.replace(/:/g, '-')}`,
         removeOnComplete: true,
       }
     )

@@ -78,6 +78,16 @@ describe('RssService', () => {
       expect(scanJobService.enqueueScan).not.toHaveBeenCalled()
     })
 
+    it('should return items even when enqueueScan throws', async () => {
+      const scanJobService = makeScanJobService()
+      ;(scanJobService.enqueueScan as jest.Mock).mockRejectedValue(new Error('Custom Id cannot contain :'))
+      const repository = makeRssRepo()
+      ;(repository.list as jest.Mock).mockResolvedValue([{ id: 1, magnet: 'magnet:?xt=urn:btih:abc', title: 'Re:Zero' }])
+      const { service } = await buildModule({ scanJobService, repository })
+      const result = await service.list({ term: 'Re:Zero', isScan: 'true' })
+      expect(result).toHaveLength(1)
+    })
+
     it('should return empty array when repository returns empty', async () => {
       const { service } = await buildModule()
       const result = await service.list({ isScan: false })
