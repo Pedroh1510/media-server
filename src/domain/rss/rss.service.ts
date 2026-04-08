@@ -24,7 +24,7 @@ export class RssService {
     scanAllItems?: string | boolean
     isScan?: string | boolean
   }) {
-    const { scanAllItems, isScan = true } = data
+    const { scanAllItems = true, isScan = true } = data
     let term = data.q ?? data.term
     if (term) term = term.replace(/ [sS]\d{1,}(.*)/g, '')
 

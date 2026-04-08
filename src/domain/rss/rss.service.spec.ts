@@ -69,7 +69,7 @@ describe('RssService', () => {
     it('should call enqueueScan when isScan is true', async () => {
       const { service, scanJobService } = await buildModule()
       await service.list({ term: 'One Piece S01', isScan: 'true' })
-      expect(scanJobService.enqueueScan).toHaveBeenCalledWith('One Piece', { scanAllItems: false })
+      expect(scanJobService.enqueueScan).toHaveBeenCalledWith('One Piece', { scanAllItems: true })
     })
 
     it('should not call enqueueScan when isScan is false', async () => {
